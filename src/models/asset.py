@@ -62,18 +62,18 @@ class Bond(Asset):
     pass
 
 
-apple = Asset(
-    "AAPL",
-    "Apple Inc.",
-    [100, 105, 110]
-)
+# apple = Asset(
+#     "AAPL",
+#     "Apple Inc.",
+#     [100, 105, 110]
+# )
 
-print(apple.ticker)
-print(apple.name)
-print(apple.prices)
+# print(apple.ticker)
+# print(apple.name)
+# print(apple.prices)
 
-prices = apple.prices
+# prices = apple.prices
 
-prices.append(9999)
+# prices.append(9999)
 
-print(apple.prices)
+# print(apple.prices)
