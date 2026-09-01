@@ -24,7 +24,7 @@ class Asset:
 
     @property
     def prices(self):
-            return self._prices.copy()
+        return self._prices.copy()
     
 
     def _validate_prices(self, prices):
