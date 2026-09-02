@@ -3,77 +3,39 @@ from asset import Asset
 from position import Position
 import pytest
 
-<<<<<<< HEAD
-=======
+@pytest.fixture
+def asset():
+    return Asset("AAPL", "Apple Inc.", [100, 105, 110])
 
+@pytest.fixture
+def position(asset):
+    return Position( asset, quantity=100, average_cost=100)
 
->>>>>>> main
-def test_position_creation():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
-
-    position = Position(
-        asset,
-        quantity=100,
-        average_cost=100
-    )
-
-
-
+def test_position_creation(asset, position):
+    
     assert position.asset == asset
     assert position.quantity == 100
     assert position.average_cost == 100
 
-def test_cost_basis():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
-
-    position = Position(
-        asset,
-        quantity=100,
-        average_cost=100
-    )
+def test_cost_basis(position):
 
     assert position.cost_basis() == 10000
 
 
-def test_market_value():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
-    
-    position = Position(
-            asset,
-            quantity=100,
-            average_cost=100
-        )
+def test_market_value(position):
 
     assert position.market_value() == 11000
     
 
-def test_unrealized_pnl():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
-        
-    position = Position(
-                asset,
-                quantity=100,
-                average_cost=100
-            )
-    
+def test_unrealized_pnl(position):
+
     assert position.unrealized_pnl() == 1000
 
 
-def test_position_invalid_quantity():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
-
-    with pytest.raises(ValueError):
-        Position(
-            asset,
-            quantity=0,
-            average_cost=100
-        )
-
-def test_position_invalid_quantity():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
+def test_position_invalid_quantity(asset):
 
     with pytest.raises(
-        ValueError, 
+        ValueError,
         match="Quantity must be greater than zero"
         ):
         Position(
@@ -82,8 +44,9 @@ def test_position_invalid_quantity():
             average_cost=100
         )
 
-def test_position_invalid_average_cost():
-    asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
+
+
+def test_position_invalid_average_cost(asset):
 
     with pytest.raises(
         ValueError, 
@@ -92,7 +55,7 @@ def test_position_invalid_average_cost():
         Position(
             asset,
             quantity=100,
-            average_cost=0
+            average_cost= -1
         )
 def test_position_invalid_asset():
 
