@@ -1,4 +1,5 @@
 from asset import Asset
+from position import Position
 class Portfolio:
     def __init__(self, name):
         if not name or not name.strip():
