@@ -3,6 +3,11 @@ from asset import Asset
 from position import Position
 import pytest
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> main
 def test_position_creation():
     asset = Asset("AAPL", "Apple Inc.", [100, 105, 110])
 
