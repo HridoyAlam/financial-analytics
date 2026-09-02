@@ -1,5 +1,10 @@
 class Asset:
-    def __init__(self, ticker, name, prices):
+    def __init__(
+            self, 
+            ticker: str, 
+            name: str, 
+            prices: list[float]
+            ):
 
         if not ticker or not ticker.strip():
             raise ValueError("Ticker can't be empty")
@@ -8,28 +13,27 @@ class Asset:
             raise ValueError("Name can't be empty")
 
         self._validate_prices(prices)
-
         
         self._ticker = ticker
         self._name = name
         self._prices = list(prices)
 
     @property
-    def ticker(self):
+    def ticker(self) -> str:
         return self._ticker
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def prices(self):
+    def prices(self) -> list[float]:
         return self._prices.copy()
     
 
-    def _validate_prices(self, prices):
+    def _validate_prices(self, prices) -> None:
         if not prices:
-            raise ValueError("prices can't be empty")
+            raise ValueError("Prices can't be empty")
         
         for price in prices:
             if price <= 0 :
@@ -37,19 +41,19 @@ class Asset:
 
         
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"{self.ticker} - {self.name}")
 
-    def current_price(self):
+    def current_price(self) -> float:
         return self._prices[-1]
 
-    def total_return(self):
+    def total_return(self) -> float:
         start_price = self._prices[0]
         end_price = self._prices[-1]
 
         return (end_price  /start_price) - 1
     
-    def total_return_percent(self):
+    def total_return_percent(self) -> float:
         return self.total_return() * 100
 
 class Stock(Asset):
