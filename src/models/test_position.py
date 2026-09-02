@@ -31,8 +31,8 @@ def test_unrealized_pnl(position):
 
     assert position.unrealized_pnl() == 1000
 
-
-def test_position_invalid_quantity(asset):
+@pytest.mark.parametrize("quantity", [0, -1])
+def test_position_invalid_quantity(asset, quantity):
 
     with pytest.raises(
         ValueError,
@@ -40,13 +40,13 @@ def test_position_invalid_quantity(asset):
         ):
         Position(
             asset,
-            quantity=0,
+            quantity=quantity,
             average_cost=100
         )
 
 
-
-def test_position_invalid_average_cost(asset):
+@pytest.mark.parametrize("average_cost", [0, -1])
+def test_position_invalid_average_cost(asset, average_cost):
 
     with pytest.raises(
         ValueError, 
@@ -55,7 +55,7 @@ def test_position_invalid_average_cost(asset):
         Position(
             asset,
             quantity=100,
-            average_cost= -1
+            average_cost= average_cost
         )
 def test_position_invalid_asset():
 
