@@ -26,7 +26,7 @@ class Portfolio:
     def positions(self) -> dict[Asset, Position]:
         return self._positions.copy()
     
-    def add_position(self, position: Position):
+    def add_position(self, position: Position) -> None:
 
         if not isinstance(position, Position):
             raise TypeError("position must be a Position-object")
