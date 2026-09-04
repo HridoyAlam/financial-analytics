@@ -28,7 +28,7 @@ sp500 = ETF(
     "SPY",
     "SPDR S&P 500 ETF",
     [500, 510, 520],
-    0
+    0.0945
 )
 
 # assets = [apple, sp500]
