@@ -56,8 +56,9 @@ class Asset:
     def total_return_percent(self) -> float:
         return self.total_return() * 100
 
-class Stock(Asset):
-    pass
+
+
+
 
 class ETF(Asset):
     pass
