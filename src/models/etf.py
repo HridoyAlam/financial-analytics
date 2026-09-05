@@ -32,7 +32,7 @@ sp500 = ETF(
 )
 
 # assets = [apple, sp500]
-print(sp500)
+# print(sp500)
 # for asset in assets:
 
 #     # print(f"{asset.ticker} - {asset.current_price()}")
