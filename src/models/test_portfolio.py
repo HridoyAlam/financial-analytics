@@ -175,10 +175,15 @@ def test_total_income(portfolio, position):
     portfolio.add_position(position)
     assert portfolio.total_income() == pytest.approx(1120.0)
 
-    """
-        AAPL    100 x 2.00                  200
-        SPY     10 x 7.00                   70
-        Bond    20 x (1000 x 4.25 /10)      850
-        total                               1120                                
+def test_allocation(portfolio, asset, position):
+    portfolio.add_position(position)
+    value = portfolio.allocation(asset)
 
-    """
+    assert value == pytest.approx(20000 / 30000 *100)
+
+def test_allocation_asset_not_found(portfolio, asset):
+    with pytest.raises(
+        ValueError,
+        match= "Asset not found in portfolio"
+    ):
+        portfolio.allocation(asset)

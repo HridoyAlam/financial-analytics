@@ -47,3 +47,87 @@ Asset
     ├── Stock.income()
     ├── ETF.income()
     └── Bond.income()
+
+===========================================
+Portfolio allocation
+
+self._positions: dict[Asset, Position] = {}
+Asset                 Position
+────────────────────────────────────────
+AAPL object    ─────→  Position(AAPL, 100, 200)
+SPY object     ─────→  Position(SPY, 10, 100)
+Bond object    ─────→  Position(Bond, 20, 150)
+
+What percentage of my portfolio is invested in each position?
+Initial capital = $30,000
+
+AAPL position = $20,000
+SPY position  = $1,000
+Bond position = $3,000
+
+The portfolio allocation would be:
+AAPL  → 66.67%
+SPY   →  3.33%
+Bond  → 10.00%
+
+And the remaining capital is: $30,000 - $24,000 = $6,000
+
+allocation =
+    position cost basis
+    ------------------- × 100
+    initial capital
+
+apple
+  ↓
+find apple in _positions
+  ↓
+get Apple Position
+  ↓
+get its cost_basis()
+  ↓
+20,000
+  ↓
+20,000 / 300,000 × 100
+  ↓
+6.6667%
+
+total_income:
+    """
+        AAPL    100 x 2.00                  200
+        SPY     10 x 7.00                   70
+        Bond    20 x (1000 x 4.25 /10)      850
+        total                               1120                                
+
+    """
+=====================================================
+
+11:33pm [6/9/26]
+
+Portfolio
+│
+├── Creation
+├── Validation
+│   ├── invalid name
+│   └── invalid capital
+│
+├── Position management
+│   ├── add position
+│   ├── duplicate asset
+│   └── insufficient capital
+│
+├── Valuation
+│   ├── current value
+│   └── total cost
+│
+├── Performance
+│   ├── total P&L
+│   ├── total return
+│   └── empty portfolio
+│
+├── Income
+│   ├── total income
+│   └── empty portfolio
+│
+└── Allocation
+    ├── valid asset
+    └── missing asset

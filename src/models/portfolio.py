@@ -97,6 +97,16 @@ class Portfolio:
         for position in self._positions.values():
             total += position.income()
         return total
+
+    def allocation(self, asset: Asset) -> float:
+
+        if  asset not in self._positions:
+            raise ValueError("Asset not found in portfolio")
+
+        position = self._positions[asset]
+        cost_basis = position.cost_basis()
+        return cost_basis / self.initial_capital * 100
+
     
 apple = Stock(
     "AAPL",
@@ -109,11 +119,11 @@ apple = Stock(
 apple_position = Position(
     apple,
     quantity=100,
-    average_cost=100
+    average_cost=200
 )
 
 
-portfolio = Portfolio("Tech Portfolio", 100000)
+portfolio = Portfolio("Tech Portfolio", 300000)
 
 portfolio.add_position(apple_position)
 
@@ -123,3 +133,4 @@ portfolio.add_position(apple_position)
 # print(f"{portfolio.total_return():.2%}")
 
 # print(portfolio.total_income())
+print(portfolio.allocation(apple))
