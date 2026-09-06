@@ -67,3 +67,7 @@ def test_bond_str(bond):
 
 def test_annual_coupon_payment(bond):
     assert bond.annual_coupon_payment() == pytest.approx(42.5)
+
+
+def test_bond_income(bond):
+    assert bond.income() == pytest.approx(42.5)

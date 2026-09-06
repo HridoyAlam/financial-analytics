@@ -75,33 +75,33 @@ class Portfolio:
         return (self.total_pnl() / total_cost) 
 
     
-apple = Asset(
-    "AAPL",
-    "Apple Inc.",
-    [100, 105, 110]
-)
-microsoft = Asset(
-    "MSFT",
-    "Microsoft Corp.",
-    [200, 205, 210]
-)
+# apple = Asset(
+#     "AAPL",
+#     "Apple Inc.",
+#     [100, 105, 110]
+# )
+# microsoft = Asset(
+#     "MSFT",
+#     "Microsoft Corp.",
+#     [200, 205, 210]
+# )
 
-apple_position = Position(
-    apple,
-    quantity=100,
-    average_cost=100
-)
+# apple_position = Position(
+#     apple,
+#     quantity=100,
+#     average_cost=100
+# )
 
-microsoft_position = Position(
-    microsoft,
-    quantity=20,
-    average_cost=200
-)
+# microsoft_position = Position(
+#     microsoft,
+#     quantity=20,
+#     average_cost=200
+# )
 
-portfolio = Portfolio("Tech Portfolio", 100000)
+# portfolio = Portfolio("Tech Portfolio", 100000)
 
-portfolio.add_position(microsoft_position)
-portfolio.add_position(apple_position)
+# portfolio.add_position(microsoft_position)
+# portfolio.add_position(apple_position)
 
 # print(portfolio.total_pnl())
 # print(portfolio.total_cost())

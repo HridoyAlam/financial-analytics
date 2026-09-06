@@ -8,7 +8,8 @@ apple = Stock(
     "AAPL",
     "Apple Inc.",
     [100, 105, 110],
-    "Technology"
+    "Technology",
+    2.0
 )
 
 spy = ETF(

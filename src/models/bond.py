@@ -41,6 +41,9 @@ class Bond(Asset):
     def annual_coupon_payment(self) -> float:
         return self.face_value * self.coupon_rate / 100
 
+    def income(self) -> float:
+        return self.annual_coupon_payment()
+
 # bond  = Bond(
 #     "US10Y",
 #     "US Treasury 10-Year Bond",
