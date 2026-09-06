@@ -75,21 +75,7 @@ class Portfolio:
         
         return (self.total_pnl() / total_cost) 
 
-    """
-        Asset
-        ↓
-        Stock / ETF / Bond
-        ↓
-        income()           ← income for ONE unit
-
-        Position
-        ↓
-        income()           ← income for MY quantity
-
-        Portfolio
-        ↓
-        total_income()     ← income for ALL positions
-    """
+    
 
     def total_income(self) -> float:
 
@@ -107,25 +93,27 @@ class Portfolio:
         cost_basis = position.cost_basis()
         return cost_basis / self.initial_capital * 100
 
+    def available_cash(self) -> float:
+        return self.initial_capital - self.total_cost()
     
-apple = Stock(
-    "AAPL",
-    "Apple Inc.",
-    [100, 105, 110],
-    "Technology",
-    2.0
-)
+# apple = Stock(
+#         "AAPL",
+#         "Apple Inc.",
+#         [100, 105, 110],
+#         "Technology",
+#         2.0
+#     )
 
-apple_position = Position(
-    apple,
-    quantity=100,
-    average_cost=200
-)
+# apple_position = Position(
+#             apple,
+#             quantity=100,
+#             average_cost=200
+#     )
 
 
-portfolio = Portfolio("Tech Portfolio", 300000)
+# portfolio = Portfolio("Tech Portfolio", 30000)
 
-portfolio.add_position(apple_position)
+# portfolio.add_position(apple_position)
 
 # print(portfolio.total_pnl())
 # print(portfolio.total_cost())
@@ -133,4 +121,5 @@ portfolio.add_position(apple_position)
 # print(f"{portfolio.total_return():.2%}")
 
 # print(portfolio.total_income())
-print(portfolio.allocation(apple))
+# print(portfolio.allocation(apple))
+# print(portfolio.available_cash())

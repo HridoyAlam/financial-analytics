@@ -99,6 +99,22 @@ total_income:
         total                               1120                                
 
     """
+
+"""
+        Asset
+        ↓
+        Stock / ETF / Bond
+        ↓
+        income()           ← income for ONE unit
+
+        Position
+        ↓
+        income()           ← income for MY quantity
+
+        Portfolio
+        ↓
+        total_income()     ← income for ALL positions
+    """
 =====================================================
 
 11:33pm [6/9/26]
@@ -131,3 +147,12 @@ Portfolio
 └── Allocation
     ├── valid asset
     └── missing asset
+
+Asset
+  → knows market/income information
+
+Position
+  → knows quantity + cost information
+
+Portfolio
+  → combines Positions

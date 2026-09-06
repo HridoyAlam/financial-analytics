@@ -187,3 +187,11 @@ def test_allocation_asset_not_found(portfolio, asset):
         match= "Asset not found in portfolio"
     ):
         portfolio.allocation(asset)
+
+def test_available_cash(portfolio, position):
+    portfolio.add_position(position)
+    assert portfolio.available_cash() == pytest.approx(10000.0)
+
+def test_available_cash_empty_portfolio( portfolio):
+    assert portfolio.available_cash() == portfolio.initial_capital
+
