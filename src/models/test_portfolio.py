@@ -1,13 +1,17 @@
-from asset import Asset
+from stock import Stock
 from position import Position
 from portfolio import Portfolio
+from bond import Bond
+from etf import ETF
 import pytest
 @pytest.fixture
 def asset():
-    return Asset(
-            "AAPL",
-            "Apple Inc.",
-            [100, 105, 110]
+    return Stock(
+        "AAPL",
+        "Apple Inc.",
+        [100, 105, 110],
+        "Technology",
+        2.0
     )
 
 @pytest.fixture
@@ -21,13 +25,13 @@ def position(asset):
 def portfolio():
     return Portfolio(
             "My Portfolio",
-            20000
+            30000
         )
 
 
 def test_portfolio_creation(portfolio):
     assert portfolio.name == "My Portfolio"
-    assert portfolio.initial_capital == 20000
+    assert portfolio.initial_capital == 30000
     assert portfolio.positions == {}
 
 @pytest.mark.parametrize("name", ["", " "])
@@ -130,3 +134,51 @@ def test_total_return_empty_portfolio(portfolio):
 
     value = portfolio.total_return()
     assert  value == 0.0
+
+def test_total_income_empty_portfolio(portfolio):
+
+    value = portfolio.total_income()
+    assert  value == 0.0
+
+def test_total_income(portfolio, position):
+
+    sp500 = ETF(
+                "SPY",
+                "SPDR S&P 500 ETF",
+                [500, 510, 520],
+                0.0945,
+                7.00
+            )
+
+    bond  = Bond(
+            "US10Y",
+            "US Treasury 10-Year Bond",
+            [98, 99, 100],
+            1000,
+            4.25,
+            10
+        )
+
+    sp_position = Position(
+         sp500,
+         quantity= 10,
+         average_cost= 100
+     )
+    bond_position = Position(
+        bond,
+        quantity=20,
+        average_cost=150
+    )
+
+    portfolio.add_position(sp_position)
+    portfolio.add_position(bond_position)
+    portfolio.add_position(position)
+    assert portfolio.total_income() == pytest.approx(1120.0)
+
+    """
+        AAPL    100 x 2.00                  200
+        SPY     10 x 7.00                   70
+        Bond    20 x (1000 x 4.25 /10)      850
+        total                               1120                                
+
+    """

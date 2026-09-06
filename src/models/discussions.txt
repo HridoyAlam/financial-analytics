@@ -1,0 +1,49 @@
+# Project Structure and design
+
+Asset (abstract)
+   ↑
+   ├── Stock
+   ├── ETF
+   └── Bond
+
+Position
+   └── Asset
+
+Portfolio
+   └── Position
+
+
+Portfolio
+│
+├── creation
+├── validation
+│   ├── invalid name
+│   └── invalid capital
+│
+├── positions
+│   ├── add position
+│   ├── duplicate position
+│   └── insufficient capital
+│
+├── valuation
+│   ├── current value
+│   └── total cost
+│
+├── performance
+│   ├── total P&L
+│   ├── total return
+│   └── empty portfolio return
+│
+└── income
+    └── total income
+
+total_income()
+
+Portfolio
+    ↓
+Position
+    ↓
+Asset
+    ├── Stock.income()
+    ├── ETF.income()
+    └── Bond.income()

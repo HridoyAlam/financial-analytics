@@ -1,4 +1,5 @@
 from asset import Asset
+from stock import Stock
 from position import Position
 class Portfolio:
     def __init__(self, name: str, initial_capital: float):
@@ -74,36 +75,51 @@ class Portfolio:
         
         return (self.total_pnl() / total_cost) 
 
+    """
+        Asset
+        ↓
+        Stock / ETF / Bond
+        ↓
+        income()           ← income for ONE unit
+
+        Position
+        ↓
+        income()           ← income for MY quantity
+
+        Portfolio
+        ↓
+        total_income()     ← income for ALL positions
+    """
+
+    def total_income(self) -> float:
+
+        total = 0.0
+        for position in self._positions.values():
+            total += position.income()
+        return total
     
-# apple = Asset(
-#     "AAPL",
-#     "Apple Inc.",
-#     [100, 105, 110]
-# )
-# microsoft = Asset(
-#     "MSFT",
-#     "Microsoft Corp.",
-#     [200, 205, 210]
-# )
+apple = Stock(
+    "AAPL",
+    "Apple Inc.",
+    [100, 105, 110],
+    "Technology",
+    2.0
+)
 
-# apple_position = Position(
-#     apple,
-#     quantity=100,
-#     average_cost=100
-# )
+apple_position = Position(
+    apple,
+    quantity=100,
+    average_cost=100
+)
 
-# microsoft_position = Position(
-#     microsoft,
-#     quantity=20,
-#     average_cost=200
-# )
 
-# portfolio = Portfolio("Tech Portfolio", 100000)
+portfolio = Portfolio("Tech Portfolio", 100000)
 
-# portfolio.add_position(microsoft_position)
-# portfolio.add_position(apple_position)
+portfolio.add_position(apple_position)
 
 # print(portfolio.total_pnl())
 # print(portfolio.total_cost())
 # print(portfolio.current_value())
 # print(f"{portfolio.total_return():.2%}")
+
+# print(portfolio.total_income())

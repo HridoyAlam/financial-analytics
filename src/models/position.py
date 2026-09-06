@@ -61,12 +61,12 @@ position = Position(
     average_cost=100
 )
 
-print(position.asset)
-print(position.quantity)
-print(position.average_cost)
-print(position.cost_basis())
-print(position.market_value())
-print(position.unrealized_pnl())
-print(position.unrealized_pnl())
+# print(position.asset)
+# print(position.quantity)
+# print(position.average_cost)
+# print(position.cost_basis())
+# print(position.market_value())
+# print(position.unrealized_pnl())
+# print(position.unrealized_pnl())
 
-print(position.income())
+# print(position.income())
