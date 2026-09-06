@@ -6,7 +6,8 @@ def etf():
         "SPY",
         "SPDR S&P 500 ETF",
         [500, 510, 520],
-        0.0945
+        0.0945,
+        7.0
     )
 
 
@@ -15,11 +16,12 @@ def test_etf_invalid_expense_ratio():
         ValueError,
         match="expense_ratio must be greater than zero"
     ):
-         ETF(
+        ETF(
         "SPY",
         "SPDR S&P 500 ETF",
         [500, 510, 520],
-        -0.0945
+        -0.0945,
+        7.0
     )
 
 def test_etf_creation(etf):
@@ -33,3 +35,19 @@ def test_etf_str(etf):
     # just etf is a object, that's it have to wrap with str
     assert str(etf) == "SPY - SPDR S&P 500 ETF  0.0945"
 
+def test_etf_income(etf):
+    assert etf.income() == pytest.approx(7.0)
+
+def test_invalid_annual_distribution():
+    with pytest.raises(
+        ValueError,
+        match="annual distribution can't be negative"
+    ):
+        ETF(
+                "SPY",
+                "SPDR S&P 500 ETF",
+                [500, 510, 520],
+                0.0945,
+                -7.0
+            )
+        
