@@ -36,6 +36,9 @@ class Stock(Asset):
     def dividend_yield(self) -> float:
         return self.annual_dividend / self.current_price() * 100
 
+    def income(self) -> float:
+        return self.dividend_yield()
+
 
 apple = Stock(
     "AAPL",
@@ -51,3 +54,4 @@ apple = Stock(
 # print(apple.sector)
 # print(apple)
 # print(apple.dividend_yield())
+# print(apple.income())

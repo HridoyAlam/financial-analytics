@@ -30,3 +30,6 @@ def test_invalid_annual_dividend(annual_dividend):
         "Technology",
         annual_dividend
     )
+
+def test_income(stock):
+    assert stock.income() == pytest.approx(1.818181)
