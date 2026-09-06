@@ -40,18 +40,18 @@ class Stock(Asset):
         return self.annual_dividend
 
 
-# apple = Stock(
-#     "AAPL",
-#     "Apple Inc.",
-#     [100, 105, 110],
-#     "Technology",
-#     2.0
-# )
+apple = Stock(
+    "AAPL",
+    "Apple Inc.",
+    [100, 105, 110],
+    "Technology",
+    2.0
+)
 
-# print(apple.ticker)
-# print(apple.name)
-# print(apple.current_price())
-# print(apple.sector)
-# print(apple)
-# print(apple.dividend_yield())
-# print(apple.income())
+print(apple.ticker)
+print(apple.name)
+print(apple.current_price())
+print(apple.sector)
+print(apple)
+print(apple.dividend_yield())
+print(apple.income())

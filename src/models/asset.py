@@ -1,4 +1,5 @@
-class Asset:
+from abc import ABC, abstractmethod
+class Asset(ABC):
     def __init__(
             self, 
             ticker: str, 
@@ -58,7 +59,7 @@ class Asset:
 
     # Since every type of asset in your project is supposed to provide income, 
     # income() belongs in the Asset interface.
-
+    @abstractmethod
     def income(self) -> float:
         raise NotImplementedError
 
@@ -72,7 +73,7 @@ class ETF(Asset):
 class Bond(Asset):
     pass
 
-
+# error will show cause we change the class into abstract class
 # apple = Asset(
 #     "AAPL",
 #     "Apple Inc.",

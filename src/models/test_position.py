@@ -1,15 +1,25 @@
 # to run this : ctrl + shift + p then : configure test > choose pytest
-from asset import Asset
+from stock import Stock
 from position import Position
 import pytest
 
 @pytest.fixture
 def asset():
-    return Asset("AAPL", "Apple Inc.", [100, 105, 110])
+    return Stock(
+        "AAPL",
+        "Apple Inc.",
+        [100, 105, 110],
+        "Technology",
+        2.0
+    )
 
 @pytest.fixture
 def position(asset):
-    return Position( asset, quantity=100, average_cost=100)
+    return Position( 
+        asset,
+        quantity=100, 
+        average_cost=100
+        )
 
 def test_position_creation(asset, position):
     
@@ -20,6 +30,7 @@ def test_position_creation(asset, position):
 def test_cost_basis(position):
 
     assert position.cost_basis() == 10000
+
 
 
 def test_market_value(position):
@@ -68,3 +79,21 @@ def test_position_invalid_asset():
             quantity=100,
             average_cost=100
 )
+
+def test_position_income(asset, position):
+    assert position.income() == pytest.approx(200.0)
+
+
+"""
+Stock.income()
+      ↓
+annual dividend = 2.0
+      ↓
+Position.income()
+      ↓
+quantity × asset.income()
+      ↓
+100 × 2.0
+      ↓
+200.0
+"""
