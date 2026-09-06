@@ -56,6 +56,12 @@ class Asset:
     def total_return_percent(self) -> float:
         return self.total_return() * 100
 
+    # Since every type of asset in your project is supposed to provide income, 
+    # income() belongs in the Asset interface.
+
+    def income(self) -> float:
+        raise NotImplementedError
+
 
 
 

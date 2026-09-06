@@ -1,4 +1,5 @@
 from asset import Asset
+from stock import Stock
 
 class Position:
     def __init__(
@@ -42,21 +43,30 @@ class Position:
     def unrealized_pnl(self) -> float:
         return self.market_value() - self.cost_basis()
 
-# apple = Asset(
-#     "AAPL",
-#     "Apple Inc.",
-#     [100, 105, 110]
-# )
+    def income(self) -> float:
+        return self.quantity * self.asset.income()
+    
 
-# position = Position(
-#     asset=apple,
-#     quantity=100,
-#     average_cost=100
-# )
+apple = Stock(
+    "AAPL",
+    "Apple Inc.",
+    [100, 105, 110],
+    "Technology",
+    2.0
+)
 
-# print(position.asset)
-# print(position.quantity)
-# print(position.average_cost)
-# print(position.cost_basis())
-# print(position.market_value())
-# print(position.unrealized_pnl())
+position = Position(
+    asset=apple,
+    quantity=100,
+    average_cost=100
+)
+
+print(position.asset)
+print(position.quantity)
+print(position.average_cost)
+print(position.cost_basis())
+print(position.market_value())
+print(position.unrealized_pnl())
+print(position.unrealized_pnl())
+
+print(position.income())
