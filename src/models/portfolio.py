@@ -99,10 +99,19 @@ class Portfolio:
     def remove_position(self, asset: Asset) -> None:
             if asset not in self._positions:
                 raise ValueError("Asset not found in portfolio")
-
             
             del self._positions[asset]
-      
+
+    def position_weight(self, asset: Asset) -> float:
+
+        if  asset not in self._positions:
+            raise ValueError("Asset not found in portfolio")
+
+        position = self._positions[asset]
+        cost_basis = position.cost_basis()
+
+        return cost_basis / self.total_cost() * 100
+        
     
 apple = Stock(
         "AAPL",
@@ -132,5 +141,6 @@ print(portfolio.total_income())
 print(portfolio.allocation(apple))
 print(portfolio.available_cash())
 
-portfolio.remove_position(apple)
-print(portfolio.available_cash())
+# portfolio.remove_position(apple)
+# print(portfolio.available_cash())
+print(portfolio.position_weight(apple))
