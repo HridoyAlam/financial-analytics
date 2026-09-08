@@ -95,31 +95,42 @@ class Portfolio:
 
     def available_cash(self) -> float:
         return self.initial_capital - self.total_cost()
+
+    def remove_position(self, asset: Asset) -> None:
+            if asset not in self._positions:
+                raise ValueError("Asset not found in portfolio")
+
+            
+            del self._positions[asset]
+      
     
-# apple = Stock(
-#         "AAPL",
-#         "Apple Inc.",
-#         [100, 105, 110],
-#         "Technology",
-#         2.0
-#     )
+apple = Stock(
+        "AAPL",
+        "Apple Inc.",
+        [100, 105, 110],
+        "Technology",
+        2.0
+    )
 
-# apple_position = Position(
-#             apple,
-#             quantity=100,
-#             average_cost=200
-#     )
+apple_position = Position(
+            apple,
+            quantity=100,
+            average_cost=200
+    )
 
 
-# portfolio = Portfolio("Tech Portfolio", 30000)
+portfolio = Portfolio("Tech Portfolio", 30000)
 
-# portfolio.add_position(apple_position)
+portfolio.add_position(apple_position)
 
-# print(portfolio.total_pnl())
-# print(portfolio.total_cost())
-# print(portfolio.current_value())
-# print(f"{portfolio.total_return():.2%}")
+print(portfolio.total_pnl())
+print(portfolio.total_cost())
+print(portfolio.current_value())
+print(f"{portfolio.total_return():.2%}")
 
-# print(portfolio.total_income())
-# print(portfolio.allocation(apple))
-# print(portfolio.available_cash())
+print(portfolio.total_income())
+print(portfolio.allocation(apple))
+print(portfolio.available_cash())
+
+portfolio.remove_position(apple)
+print(portfolio.available_cash())

@@ -45,6 +45,10 @@ class Position:
 
     def income(self) -> float:
         return self.quantity * self.asset.income()
+
+          
+        
+        
     
 
 apple = Stock(

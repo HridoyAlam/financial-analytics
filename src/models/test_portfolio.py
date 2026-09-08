@@ -195,3 +195,22 @@ def test_available_cash(portfolio, position):
 def test_available_cash_empty_portfolio( portfolio):
     assert portfolio.available_cash() == portfolio.initial_capital
 
+def test_remove_position( portfolio, asset, position):
+    portfolio.add_position(position)
+    portfolio.remove_position(asset)
+    assert portfolio.positions == {}
+
+def test_remove_position_asset_not_found( portfolio, asset):
+    with pytest.raises(
+        ValueError,
+        match= "Asset not found in portfolio"
+        ):
+            portfolio.remove_position(asset)
+    
+
+def test_available_cash_after_remove(portfolio, asset, position):
+    portfolio.add_position(position)
+
+    portfolio.remove_position(asset)
+
+    assert portfolio.available_cash() == pytest.approx(30000.0)
