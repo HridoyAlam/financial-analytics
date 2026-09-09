@@ -81,3 +81,27 @@ def test_total_value(asset):
         )
 
     assert transaction.total_value() == pytest.approx(5000)
+
+def test_invalid_transaction_type(asset):
+    with pytest.raises(
+        ValueError,
+        match= "Transaction type must either BUY or SELL"
+    ):
+        Transaction(
+            asset,
+            "Hold",
+            50,
+            100
+            )
+    
+def test_invalid_asset():
+    with pytest.raises(
+        TypeError,
+        match="asset must be an instance of Asset"
+    ):
+        Transaction(
+                    "MSTP",
+                    "BUY",
+                    50,
+                    100
+                    )
