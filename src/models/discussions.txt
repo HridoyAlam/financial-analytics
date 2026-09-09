@@ -156,3 +156,27 @@ Position
 
 Portfolio
   → combines Positions
+
+============================
+            Positions
+-------------------
+    # apply_transaction
+
+Requirements:
+
+The argument must be a Transaction.
+The transaction must belong to the same asset as the position.
+The transaction must be "BUY".
+Increase the position's quantity.
+Recalculate the average cost.
+
+eg: 
+Before : 100 shares @ $200
+transaction: BUY 50 @ $220
+after: 
+quantity = 150   
+average_cost ((100 × 200 + 50 × 220) / 150) = $206.6667
+
+Realized P&L = (Sell Price - Average Cost) × Quantity Sold
+             = (220 - 200) × 30
+             = $600

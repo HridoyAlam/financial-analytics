@@ -1,6 +1,7 @@
 # to run this : ctrl + shift + p then : configure test > choose pytest
 from stock import Stock
 from position import Position
+from transaction import Transaction
 import pytest
 
 @pytest.fixture
@@ -14,23 +15,34 @@ def asset():
     )
 
 @pytest.fixture
+def other_asset():
+    return Stock(
+        "MSFT",
+        "Microsoft Corp.",
+        [200, 205, 210],
+        "Technology",
+        2.0
+    )
+
+@pytest.fixture
 def position(asset):
     return Position( 
         asset,
         quantity=100, 
-        average_cost=100
+        average_cost=200,
         )
 
 def test_position_creation(asset, position):
     
     assert position.asset == asset
     assert position.quantity == 100
-    assert position.average_cost == 100
+    assert position.average_cost == 200
 
 def test_cost_basis(position):
+    assert position.cost_basis() == 20000
 
-    assert position.cost_basis() == 10000
-
+def test_realized_pnl (position):
+    assert position.realized_pnl == 0
 
 
 def test_market_value(position):
@@ -40,7 +52,7 @@ def test_market_value(position):
 
 def test_unrealized_pnl(position):
 
-    assert position.unrealized_pnl() == 1000
+    assert position.unrealized_pnl() == -9000
 
 @pytest.mark.parametrize("quantity", [0, -1])
 def test_position_invalid_quantity(asset, quantity):
@@ -80,20 +92,93 @@ def test_position_invalid_asset():
             average_cost=100
 )
 
-def test_position_income(asset, position):
+def test_position_income(position):
     assert position.income() == pytest.approx(200.0)
 
 
-"""
-Stock.income()
-      ↓
-annual dividend = 2.0
-      ↓
-Position.income()
-      ↓
-quantity × asset.income()
-      ↓
-100 × 2.0
-      ↓
-200.0
-"""
+def test_apply_transaction_buy(asset, position):
+    transaction = Transaction(
+                asset,
+                "Buy",
+                50,
+                220
+    )
+    position.apply_transaction(transaction)
+    assert position.average_cost == pytest.approx(206.66666666666666)
+    assert position.quantity == pytest.approx(150)
+
+def test_apply_transaction_sell(asset, position):
+    transaction = Transaction(
+                asset,
+                "Sell",
+                50,
+                220,
+                
+    )
+    position.apply_transaction(transaction)
+    assert position.quantity == pytest.approx(50)
+    assert position.average_cost == pytest.approx(200)
+    assert position.realized_pnl == pytest.approx(1000)
+def test_apply_transaction_extra_sell(asset, position):
+    transaction1 = Transaction(
+                asset,
+                "Sell",
+                20,
+                220,
+                
+    )
+
+    position.apply_transaction(transaction1)
+    assert position.realized_pnl == pytest.approx(400)
+
+    transaction2 = Transaction(
+                asset,
+                "Sell",
+                30,
+                180,
+                
+    )
+    position.apply_transaction(transaction2)
+    assert position.realized_pnl == pytest.approx(-200)
+
+    
+
+def test_apply_transaction_invalid_asset(other_asset, position):
+
+    transaction = Transaction(
+                    other_asset,
+                    "Buy",
+                    50,
+                    220
+        )
+    with pytest.raises(
+        ValueError,
+        match="Transaction asset must match position asset"
+    ):
+        position.apply_transaction(transaction)
+
+def test_apply_transaction_over_sell(asset, position):
+
+    transaction = Transaction(
+                    asset,
+                    "SELL",
+                    150,
+                    220
+        )
+    with pytest.raises(
+        ValueError,
+        match="Selling quantity cannot exceed position quantity"
+    ):
+        position.apply_transaction(transaction)
+def test_apply_transaction_final_sell_edge_case(asset, position):
+
+    transaction = Transaction(
+                    asset,
+                    "SELL",
+                    100,
+                    220
+        )
+    position.apply_transaction(transaction)
+    assert  position.quantity ==  0
+    assert  position.average_cost ==  200
+    assert  position.realized_pnl ==  2000

@@ -43,3 +43,5 @@ class Transaction():
 
     def total_value(self) -> float:
         return self.quantity * self.price
+
+    

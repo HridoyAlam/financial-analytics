@@ -1,5 +1,6 @@
 from asset import Asset
 from stock import Stock
+from transaction import Transaction
 
 class Position:
     def __init__(
@@ -22,6 +23,8 @@ class Position:
         self._quantity = quantity
         self._average_cost = average_cost
 
+        self._realized_pnl = 0.0
+
     @property
     def asset(self) -> Asset:
         return self._asset
@@ -33,6 +36,10 @@ class Position:
     @property
     def average_cost(self) -> float:
         return self._average_cost
+
+    @property
+    def realized_pnl(self) -> float:
+        return self._realized_pnl
 
     def cost_basis(self) -> float:
         return self.quantity * self.average_cost
@@ -46,9 +53,36 @@ class Position:
     def income(self) -> float:
         return self.quantity * self.asset.income()
 
-          
-        
-        
+
+    def apply_transaction(self, transaction: Transaction) -> None:
+        if transaction.asset != self.asset:
+            raise ValueError("Transaction asset must match position asset")
+
+        if transaction.transaction_type == "BUY":
+            # raise ValueError("The transaction must be \"BUY\"")
+
+            old_cost = self.quantity * self.average_cost
+            new_cost = transaction.quantity * transaction.price
+
+            combined_cost = old_cost + new_cost
+            new_quantity = self.quantity + transaction.quantity
+
+            new_average_cost = combined_cost / new_quantity
+
+            self._quantity = new_quantity
+            self._average_cost = new_average_cost
+
+        elif transaction.transaction_type == "SELL":
+
+            if self.quantity < transaction.quantity:
+                raise ValueError("Selling quantity cannot exceed position quantity")
+
+            realized_pnl = (transaction.price - self.average_cost) * transaction.quantity
+
+            self._quantity -= transaction.quantity
+            self._realized_pnl += realized_pnl
+
+       
     
 
 apple = Stock(
@@ -62,8 +96,22 @@ apple = Stock(
 position = Position(
     asset=apple,
     quantity=100,
-    average_cost=100
+    average_cost=200
 )
+
+buy_transaction = Transaction(
+    apple,
+    "Buy",
+    50,
+    220
+)
+sell_transaction = Transaction(
+    apple,
+    "Sell",
+    30,
+    220
+)
+
 
 # print(position.asset)
 # print(position.quantity)
@@ -72,5 +120,13 @@ position = Position(
 # print(position.market_value())
 # print(position.unrealized_pnl())
 # print(position.unrealized_pnl())
-
 # print(position.income())
+
+# position.apply_transaction(buy_transaction)
+# print(position.quantity)
+# print(position.average_cost)
+
+position.apply_transaction(sell_transaction)
+print(position.quantity)
+print(position.average_cost)
+print(position.realized_pnl)
