@@ -195,12 +195,12 @@ def test_available_cash(portfolio, position):
 def test_available_cash_empty_portfolio( portfolio):
     assert portfolio.available_cash() == portfolio.initial_capital
 
-def test_remove_position( portfolio, asset, position):
+def test_remove_position(portfolio, asset, position):
     portfolio.add_position(position)
     portfolio.remove_position(asset)
     assert portfolio.positions == {}
 
-def test_remove_position_asset_not_found( portfolio, asset):
+def test_remove_position_asset_not_found(portfolio, asset):
     with pytest.raises(
         ValueError,
         match= "Asset not found in portfolio"
@@ -214,3 +214,33 @@ def test_available_cash_after_remove(portfolio, asset, position):
     portfolio.remove_position(asset)
 
     assert portfolio.available_cash() == pytest.approx(30000.0)
+
+def test_position_weight(portfolio, position, asset):
+    portfolio.add_position(position)
+    assert portfolio.position_weight(asset) == pytest.approx(100.0)
+
+def test_position_weight_asset_not_found(portfolio, asset):
+    with pytest.raises(
+        ValueError,
+        match= "Asset not found in portfolio"
+        ):
+        portfolio.position_weight(asset)
+def test_position_weight_multiple_positions(portfolio, position, asset):
+    sp500 = ETF(
+        "SPY",
+        "SPDR S&P 500 ETF",
+        [500, 510, 520],
+        0.0945,
+        7.00
+    )
+    sp_position = Position(
+        sp500,
+        quantity=10,
+        average_cost=500
+    )
+    portfolio.add_position(position)       # 20,000
+    portfolio.add_position(sp_position)   # 5,000
+    # appl + spy cost = 20,000 + 5000 = 25,000 
+    # appl weight = 20,000/25,000 * 100 = 80%
+    assert portfolio.position_weight(asset) == pytest.approx(80.0)
+
