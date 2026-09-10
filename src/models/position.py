@@ -40,6 +40,10 @@ class Position:
     @property
     def realized_pnl(self) -> float:
         return self._realized_pnl
+    
+    @property
+    def is_active(self) -> bool:
+        return self.quantity > 0
 
     def cost_basis(self) -> float:
         return self.quantity * self.average_cost
