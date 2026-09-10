@@ -183,7 +183,7 @@ def test_apply_transaction_final_sell_edge_case(asset, position):
     assert  position.average_cost ==  200
     assert  position.realized_pnl ==  2000
 
-def test_is_active_true(asset, position):
+def test_is_active_after_partial_sell(asset, position):
     transaction = Transaction(
                     asset,
                     "SELL",
@@ -193,7 +193,7 @@ def test_is_active_true(asset, position):
     position.apply_transaction(transaction)
     assert  position.is_active is True
 
-def test_is_active_false(asset, position):
+def test_is_active_after_full_sell(asset, position):
     transaction = Transaction(
                     asset,
                     "SELL",
