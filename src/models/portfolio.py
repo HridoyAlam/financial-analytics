@@ -1,6 +1,7 @@
 from asset import Asset
 from stock import Stock
 from position import Position
+from transaction import Transaction
 class Portfolio:
     def __init__(self, name: str, initial_capital: float):
 
@@ -14,6 +15,8 @@ class Portfolio:
         self._initial_capital = initial_capital
         self._positions: dict[Asset, Position] =  {}
 
+        self._cash = initial_capital
+
 
     @property
     def name(self) -> str:
@@ -26,6 +29,10 @@ class Portfolio:
     @property
     def positions(self) -> dict[Asset, Position]:
         return self._positions.copy()
+
+    @property
+    def cash(self) -> float:
+        return self._cash
     
     def add_position(self, position: Position) -> None:
 
@@ -35,14 +42,11 @@ class Portfolio:
         if position.asset in self._positions:
             raise ValueError("Asset already exists in portfolio")
 
-        current_cost = 0.0
-        for existing_position in self._positions.values():
-            current_cost += existing_position.cost_basis()
-
-        if current_cost + position.cost_basis() > self.initial_capital:
+        if position.cost_basis() > self._cash:
             raise ValueError("Insufficient capital")
 
         self._positions[position.asset] = position
+        self._cash -= position.cost_basis()
 
     def current_value(self) -> float:
         total = 0.0
@@ -94,7 +98,7 @@ class Portfolio:
         return cost_basis / self.initial_capital * 100
 
     def available_cash(self) -> float:
-        return self.initial_capital - self.total_cost()
+        return self._cash
 
     def remove_position(self, asset: Asset) -> None:
             if asset not in self._positions:
@@ -111,7 +115,19 @@ class Portfolio:
         cost_basis = position.cost_basis()
 
         return cost_basis / self.total_cost() * 100
-        
+
+    def apply_transaction(self, transaction: Transaction) -> None:
+        if transaction.asset not in self._positions:
+            raise ValueError("Asset not found in portfolio")
+
+        position = self._positions[transaction.asset]
+        position.apply_transaction(transaction)
+
+        if transaction.transaction_type == "SELL":
+            self._cash += transaction.total_value()
+    
+        if transaction.transaction_type == "BUY":
+            self._cash -= transaction.total_value()
     
 apple = Stock(
         "AAPL",
@@ -139,8 +155,29 @@ print(f"{portfolio.total_return():.2%}")
 
 print(portfolio.total_income())
 print(portfolio.allocation(apple))
-print(portfolio.available_cash())
+print(f"available_cash:{portfolio.available_cash()}")
 
 # portfolio.remove_position(apple)
 # print(portfolio.available_cash())
 print(portfolio.position_weight(apple))
+
+buy_transaction = Transaction(
+    apple,
+    "BUY",
+    50,
+    180
+)
+portfolio.apply_transaction(buy_transaction)
+print(f"after buy available_cash:{portfolio.available_cash()}")
+
+
+sell_transaction = Transaction(
+    apple,
+    "SELL",
+    50,
+    220
+)
+portfolio.apply_transaction(sell_transaction)
+print(apple_position.quantity)
+print(apple_position.realized_pnl)
+print(f"after sell available_cash:{portfolio.available_cash()}")

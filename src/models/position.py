@@ -59,7 +59,6 @@ class Position:
             raise ValueError("Transaction asset must match position asset")
 
         if transaction.transaction_type == "BUY":
-            # raise ValueError("The transaction must be \"BUY\"")
 
             old_cost = self.quantity * self.average_cost
             new_cost = transaction.quantity * transaction.price

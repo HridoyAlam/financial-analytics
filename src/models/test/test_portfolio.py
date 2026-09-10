@@ -1,6 +1,7 @@
 from stock import Stock
 from position import Position
 from portfolio import Portfolio
+from transaction import Transaction
 from bond import Bond
 from etf import ETF
 import pytest
@@ -10,6 +11,16 @@ def asset():
         "AAPL",
         "Apple Inc.",
         [100, 105, 110],
+        "Technology",
+        2.0
+    )
+
+@pytest.fixture
+def other_asset():
+    return Stock(
+        "MSFT",
+        "Microsoft Corp.",
+        [200, 205, 210],
         "Technology",
         2.0
     )
@@ -213,7 +224,7 @@ def test_available_cash_after_remove(portfolio, asset, position):
 
     portfolio.remove_position(asset)
 
-    assert portfolio.available_cash() == pytest.approx(30000.0)
+    assert portfolio.available_cash() == pytest.approx(10000.0)
 
 def test_position_weight(portfolio, position, asset):
     portfolio.add_position(position)
@@ -244,3 +255,75 @@ def test_position_weight_multiple_positions(portfolio, position, asset):
     # appl weight = 20,000/25,000 * 100 = 80%
     assert portfolio.position_weight(asset) == pytest.approx(80.0)
 
+@pytest.fixture
+def buy_transaction(asset):
+    return Transaction(
+        asset,
+        "BUY",
+        50,
+        180
+    )
+@pytest.fixture
+def sell_transaction(asset):
+    return Transaction(
+        asset,
+        "SEll",
+        50,
+        220
+    )
+
+def test_portfolio_apply_transaction(buy_transaction, position, portfolio):
+    portfolio.add_position(position)
+    portfolio.apply_transaction(buy_transaction)
+
+    assert position.quantity == 150
+    assert position.average_cost == pytest.approx(193.333333)
+
+def test_portfolio_apply_transaction_sell(sell_transaction, position, portfolio):
+    
+    portfolio.add_position(position)
+    portfolio.apply_transaction(sell_transaction)
+
+    assert position.quantity == 50
+    assert position.realized_pnl == pytest.approx(1000.0)
+
+def test_portfolio_apply_transaction_sell_more(asset, position, portfolio):
+    transaction = Transaction(
+        asset,
+        "SEll",
+        110,
+        220
+    )
+    portfolio.add_position(position)
+
+    with pytest.raises(
+            ValueError,
+            match="Selling quantity cannot exceed position quantity"
+        ):
+        portfolio.apply_transaction(transaction)
+
+    
+
+def test_portfolio_apply_transaction_invalid_asset(other_asset, portfolio):
+    transaction = Transaction(other_asset, "BUY", 50, 220)
+    with pytest.raises(
+        ValueError,
+        match="Asset not found in portfolio"
+    ):
+     
+        portfolio.apply_transaction(transaction)
+        
+def test_initial_cash(portfolio):
+    assert portfolio.initial_capital == 30000
+
+def test_buy_reduce_cash(buy_transaction, position,portfolio):
+    portfolio.add_position(position)
+    portfolio.apply_transaction(buy_transaction)
+
+    assert portfolio.available_cash() == pytest.approx(1000.0)
+
+def test_sell_increase_cash(sell_transaction, position,portfolio):
+    portfolio.add_position(position)
+    portfolio.apply_transaction(sell_transaction)
+
+    assert portfolio.available_cash() == pytest.approx(21000.0)
