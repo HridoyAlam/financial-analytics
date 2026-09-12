@@ -128,6 +128,16 @@ class Portfolio:
     
         if transaction.transaction_type == "BUY":
             self._cash -= transaction.total_value()
+
+    def active_positions(self) -> list[Position]:
+        active_positions = []
+        for position in self._positions.values():
+            if position.is_active:
+                active_positions.append(position)
+            
+
+        return active_positions
+
     
 apple = Stock(
         "AAPL",
@@ -161,23 +171,25 @@ print(f"available_cash:{portfolio.available_cash()}")
 # print(portfolio.available_cash())
 print(portfolio.position_weight(apple))
 
-buy_transaction = Transaction(
-    apple,
-    "BUY",
-    50,
-    180
-)
-portfolio.apply_transaction(buy_transaction)
-print(f"after buy available_cash:{portfolio.available_cash()}")
+# buy_transaction = Transaction(
+#     apple,
+#     "BUY",
+#     50,
+#     180
+# )
+# portfolio.apply_transaction(buy_transaction)
+# print(f"after buy available_cash:{portfolio.available_cash()}")
 
 
-sell_transaction = Transaction(
-    apple,
-    "SELL",
-    50,
-    220
-)
-portfolio.apply_transaction(sell_transaction)
-print(apple_position.quantity)
-print(apple_position.realized_pnl)
-print(f"after sell available_cash:{portfolio.available_cash()}")
+# sell_transaction = Transaction(
+#     apple,
+#     "SELL",
+#     50,
+#     220
+# )
+# portfolio.apply_transaction(sell_transaction)
+# print(apple_position.quantity)
+# print(apple_position.realized_pnl)
+# print(f"after sell available_cash:{portfolio.available_cash()}")
+
+

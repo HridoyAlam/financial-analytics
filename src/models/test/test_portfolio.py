@@ -236,19 +236,24 @@ def test_position_weight_asset_not_found(portfolio, asset):
         match= "Asset not found in portfolio"
         ):
         portfolio.position_weight(asset)
-def test_position_weight_multiple_positions(portfolio, position, asset):
-    sp500 = ETF(
+@pytest.fixture
+def sp500():
+    return ETF(
         "SPY",
         "SPDR S&P 500 ETF",
         [500, 510, 520],
         0.0945,
         7.00
     )
-    sp_position = Position(
-        sp500,
-        quantity=10,
-        average_cost=500
+@pytest.fixture
+def sp_position(sp500):
+    return Position(
+            sp500,
+            quantity=10,
+            average_cost=500
     )
+def test_position_weight_multiple_positions(sp_position, portfolio, position, asset):
+    
     portfolio.add_position(position)       # 20,000
     portfolio.add_position(sp_position)   # 5,000
     # appl + spy cost = 20,000 + 5000 = 25,000 
@@ -327,3 +332,46 @@ def test_sell_increase_cash(sell_transaction, position,portfolio):
     portfolio.apply_transaction(sell_transaction)
 
     assert portfolio.available_cash() == pytest.approx(21000.0)
+
+def test_active_positions(portfolio, position, sp_position):
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position)   
+
+    assert portfolio.active_positions() == [position, sp_position]
+
+def test_active_positions_excludes_closed_sp500_position(
+    portfolio,
+    position,
+    asset,
+    sp_position   
+):
+    transaction = Transaction(
+            asset,
+            "SEll",
+            100,
+            220
+        )
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position) 
+
+    
+    portfolio.apply_transaction(transaction)
+    assert portfolio.active_positions() == [sp_position]
+def test_active_positions_excludes_closed_position_extra(
+    portfolio,
+    position,
+    sp500,
+    sp_position   
+):
+    transaction = Transaction(
+            sp500,
+            "SEll",
+            10,
+            500
+        )
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position) 
+
+    
+    portfolio.apply_transaction(transaction)
+    assert portfolio.active_positions() == [position]
