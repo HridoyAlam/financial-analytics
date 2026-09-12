@@ -150,6 +150,9 @@ class Portfolio:
             total += position.realized_pnl
 
         return total
+
+    def combined_pnl(self) -> float:
+        return self.realized_pnl() + self.total_pnl()
     
 apple = Stock(
         "AAPL",

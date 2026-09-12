@@ -222,3 +222,7 @@ Position
 Portfolio
 ├── total_pnl() → currently unrealized P&L
 └── realized_pnl() → accumulated realized P&L
+
+realized_pnl() → realized only
+total_pnl() → currently unrealized only
+combined_pnl() → realized + unrealized

@@ -445,3 +445,13 @@ def test_realized_pnl_closed_position(
 
     assert position.is_active is False
     assert portfolio.realized_pnl() == 2000
+
+def combined_pnl(
+    portfolio,
+    position,
+    sell_transaction
+    ):
+    portfolio.add_position(position)
+    portfolio.apply_transaction(sell_transaction)
+
+    assert portfolio.total_return_pnl() == -3500
