@@ -1,11 +1,13 @@
 from cash_flow import CashFlow
 import pytest
+import datetime as dt
 
 @pytest.mark.parametrize("param", ["deposit", "Deposit", "DEPOSIT"])
 def test_valid_deposit(param):
     cash_flow = CashFlow(
         10,
-        param
+        param,
+        dt.datetime(2026, 1, 1)
     )
     assert cash_flow.amount == 10
     assert cash_flow.flow_type == "DEPOSIT"
@@ -14,7 +16,8 @@ def test_valid_deposit(param):
 def test_valid_withdrawal(param):
     cash_flow = CashFlow(
         10,
-        param
+        param,
+        dt.datetime(2026, 1, 1)
     )
     assert cash_flow.flow_type == "WITHDRAWAL"
 
@@ -25,7 +28,8 @@ def test_invalid_amount_withdrawal():
     ):
         CashFlow(
             0,
-            "WITHDRAWAL"
+            "WITHDRAWAL",
+            dt.datetime(2026, 1, 1)
         )
 def test_invalid_amount_deposit():
     with pytest.raises(
@@ -34,7 +38,8 @@ def test_invalid_amount_deposit():
     ):
         CashFlow(
             0,
-            "DEPOSIT"
+            "DEPOSIT",
+            dt.datetime(2026, 1, 1)
         )
 def test_invalid_flow_type():
     with pytest.raises(
@@ -43,5 +48,26 @@ def test_invalid_flow_type():
     ):
         CashFlow(
             100,
-            "Deport"
+            "Deport",
+            dt.datetime(2026, 1, 1)
         )
+def test_invalid_timestamp():
+    with pytest.raises(
+        TypeError,
+        match="timestamp must be a datetime"
+    ):
+        CashFlow(
+            100,
+            "DEPOSIT",
+            "2026-1-1"
+        )
+def test_valid_timestamp():
+    timestamp = dt.datetime(2026, 1, 1)
+
+    cash_flow = CashFlow(
+        100,
+        "DEPOSIT",
+        timestamp
+    )
+
+    assert cash_flow.timestamp == timestamp
