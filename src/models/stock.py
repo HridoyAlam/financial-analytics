@@ -1,10 +1,11 @@
 from asset import Asset
+import datetime as dt
 
 class Stock(Asset):
     def __init__(self, 
                  ticker: str, 
                  name: str, 
-                 prices: list[float], 
+                 prices: list[tuple[dt.datetime, float]], 
                  sector: str,
                  annual_dividend: float) -> None:
         super().__init__(ticker, name, prices)
@@ -40,13 +41,19 @@ class Stock(Asset):
         return self.annual_dividend
 
 
-apple = Stock(
-    "AAPL",
-    "Apple Inc.",
-    [100, 105, 110],
-    "Technology",
-    2.0
-)
+prices = [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
+
+# apple = Stock(
+#     "AAPL",
+#     "Apple Inc.",
+#     prices,
+#     "Technology",
+#     2.0
+# )
 
 # print(apple.ticker)
 # print(apple.name)
