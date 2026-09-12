@@ -213,3 +213,12 @@ is_active = False
 ├── active_positions() → excludes it
 │
 └── closed_positions() → includes it
+
+============== P&L architecture ===================
+Position
+├── unrealized_pnl() → current open position
+└── realized_pnl → completed sales
+
+Portfolio
+├── total_pnl() → currently unrealized P&L
+└── realized_pnl() → accumulated realized P&L

@@ -432,3 +432,16 @@ def test_realized_pnl_multiple_positions(
     portfolio.apply_transaction(sp500_sell)
 
     assert portfolio.realized_pnl() == 750
+
+
+def test_realized_pnl_closed_position(
+    portfolio,
+    position,
+    asset_sell,
+       
+):
+    portfolio.add_position(position)       
+    portfolio.apply_transaction(asset_sell)
+
+    assert position.is_active is False
+    assert portfolio.realized_pnl() == 2000
