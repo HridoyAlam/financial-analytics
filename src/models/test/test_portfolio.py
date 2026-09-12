@@ -415,3 +415,20 @@ def test_closed_positions_empty(portfolio, position):
     portfolio.add_position(position)
 
     assert portfolio.closed_positions() == []
+
+def test_realized_pnl_multiple_positions(
+        sp500, portfolio, position, sp_position ,sell_transaction):
+    portfolio.add_position(position)
+    portfolio.add_position(sp_position)
+
+    sp500_sell = Transaction(
+            sp500,
+            "SEll",
+            5,
+            450
+        )
+
+    portfolio.apply_transaction(sell_transaction) 
+    portfolio.apply_transaction(sp500_sell)
+
+    assert portfolio.realized_pnl() == 750

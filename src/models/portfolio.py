@@ -80,7 +80,6 @@ class Portfolio:
         return (self.total_pnl() / total_cost) 
 
     
-
     def total_income(self) -> float:
 
         total = 0.0
@@ -144,8 +143,13 @@ class Portfolio:
                 closed_positions.append(position) 
         return closed_positions
 
-    
+    def realized_pnl(self) -> float:
+        total = 0.0
 
+        for position in self._positions.values():
+            total += position.realized_pnl
+
+        return total
     
 apple = Stock(
         "AAPL",
