@@ -339,39 +339,79 @@ def test_active_positions(portfolio, position, sp_position):
 
     assert portfolio.active_positions() == [position, sp_position]
 
-def test_active_positions_excludes_closed_sp500_position(
-    portfolio,
-    position,
-    asset,
-    sp_position   
-):
-    transaction = Transaction(
+@pytest.fixture
+def asset_sell(asset):
+    return Transaction(
             asset,
             "SEll",
             100,
             220
         )
-    portfolio.add_position(position)       
-    portfolio.add_position(sp_position) 
 
-    
-    portfolio.apply_transaction(transaction)
-    assert portfolio.active_positions() == [sp_position]
-def test_active_positions_excludes_closed_position_extra(
-    portfolio,
-    position,
-    sp500,
-    sp_position   
-):
-    transaction = Transaction(
+@pytest.fixture
+def sp500_sell(sp500):
+    return Transaction(
             sp500,
             "SEll",
             10,
             500
         )
+
+def test_active_positions_excludes_closed_sp500_position(
+    portfolio,
+    position,
+    asset_sell,
+    sp_position   
+):
+    
     portfolio.add_position(position)       
     portfolio.add_position(sp_position) 
 
+    portfolio.apply_transaction(asset_sell)
+
+    assert portfolio.active_positions() == [sp_position]
+
+def test_active_positions_excludes_closed_position_extra(
+    portfolio,
+    position,
+    sp500_sell,
+    sp_position   
+):
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position) 
+
+    portfolio.apply_transaction(sp500_sell)
     
-    portfolio.apply_transaction(transaction)
     assert portfolio.active_positions() == [position]
+
+def test_closed_positions_asset_position(
+    portfolio,
+    position,
+    sp500_sell,
+    sp_position   
+):
+    
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position) 
+
+    portfolio.apply_transaction(sp500_sell)
+
+    assert portfolio.closed_positions() == [sp_position]
+
+def test_closed_positions_sp500_position(
+    portfolio,
+    position,
+    asset_sell,
+    sp_position   
+):
+    portfolio.add_position(position)       
+    portfolio.add_position(sp_position) 
+
+    portfolio.apply_transaction(asset_sell)
+
+    assert portfolio.closed_positions() == [position]
+
+def test_closed_positions_empty(portfolio, position):
+    portfolio.add_position(position)
+
+    assert portfolio.closed_positions() == []

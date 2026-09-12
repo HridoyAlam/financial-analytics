@@ -190,3 +190,26 @@ Realized P&L = (Sell Price - Average Cost) × Quantity Sold
 
 BUY → available_cash decreases by transaction price × quantity
 SELL → available_cash increases by transaction price × quantity
+
+================================
+Positions lifecycle
+
+Position created
+│
+▼
+quantity > 0
+is_active = True
+│
+│ SELL
+▼
+quantity > 0
+is_active = True
+│
+│ final SELL
+▼
+quantity = 0
+is_active = False
+│
+├── active_positions() → excludes it
+│
+└── closed_positions() → includes it

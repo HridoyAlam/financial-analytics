@@ -134,9 +134,17 @@ class Portfolio:
         for position in self._positions.values():
             if position.is_active:
                 active_positions.append(position)
-            
-
         return active_positions
+    
+    def closed_positions(self) -> list[Position]:
+        closed_positions = []
+
+        for position in self._positions.values():
+            if not position.is_active:
+                closed_positions.append(position) 
+        return closed_positions
+
+    
 
     
 apple = Stock(
