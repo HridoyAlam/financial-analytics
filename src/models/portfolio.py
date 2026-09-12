@@ -2,6 +2,7 @@ from asset import Asset
 from stock import Stock
 from position import Position
 from transaction import Transaction
+from cash_flow import CashFlow
 class Portfolio:
     def __init__(self, name: str, initial_capital: float):
 
@@ -74,6 +75,7 @@ class Portfolio:
     
     def total_return(self) -> float:
         total_cost = self.total_cost()
+        
         if total_cost == 0:
             return 0.0
         
@@ -128,6 +130,16 @@ class Portfolio:
         if transaction.transaction_type == "BUY":
             self._cash -= transaction.total_value()
 
+    def apply_cash_flow(self, cash_flow: CashFlow) -> None:
+        if cash_flow.flow_type == "DEPOSIT":
+            self._cash += cash_flow.amount
+
+        elif cash_flow.flow_type == "WITHDRAWAL":
+            if self._cash < cash_flow.amount:
+                raise ValueError("Withdrawal exceeding available cash")
+
+            self._cash -= cash_flow.amount
+
     def active_positions(self) -> list[Position]:
         active_positions = []
         for position in self._positions.values():
@@ -153,6 +165,8 @@ class Portfolio:
 
     def combined_pnl(self) -> float:
         return self.realized_pnl() + self.total_pnl()
+
+    
     
 apple = Stock(
         "AAPL",

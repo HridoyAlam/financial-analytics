@@ -2,6 +2,7 @@ from stock import Stock
 from position import Position
 from portfolio import Portfolio
 from transaction import Transaction
+from cash_flow import CashFlow
 from bond import Bond
 from etf import ETF
 import pytest
@@ -455,3 +456,55 @@ def combined_pnl(
     portfolio.apply_transaction(sell_transaction)
 
     assert portfolio.total_return_pnl() == -3500
+
+@pytest.fixture
+def cash_withdraw():
+    return CashFlow(
+        5000,
+        "WITHDRAWal"
+    )
+@pytest.fixture
+def cash_deposit():
+    return CashFlow(
+        5000,
+        "DEPOSIT"
+    )
+@pytest.fixture
+def large_withdrawal():
+    return CashFlow(
+        15000,
+        "WITHDRAWal"
+    )
+def test_apply_cash_flow_withdrawal(position, portfolio, cash_withdraw):
+    portfolio.add_position(position)  
+    portfolio.apply_cash_flow(cash_withdraw)
+
+    assert portfolio.cash == 5000
+
+
+def test_apply_cash_flow_deposit(position, portfolio, cash_deposit):
+
+    portfolio.add_position(position)  
+    portfolio.apply_cash_flow(cash_deposit)
+
+    assert portfolio.cash == 15000
+
+def test_apply_cash_flow_insufficient_cash(position, portfolio, large_withdrawal):
+    portfolio.add_position(position)  
+    
+    with pytest.raises(
+        ValueError,
+        match="Withdrawal exceeding available cash"
+    ):
+        portfolio.apply_cash_flow(large_withdrawal)
+        
+def test_failed_withdrawal_does_not_modify_cash(position, portfolio, large_withdrawal):
+    portfolio.add_position(position)  
+    initial_cash = portfolio.cash
+    
+    with pytest.raises(
+        ValueError,
+        match="Withdrawal exceeding available cash"
+    ):
+        portfolio.apply_cash_flow(large_withdrawal)
+    assert portfolio.cash == initial_cash
