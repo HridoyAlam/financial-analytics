@@ -17,7 +17,11 @@ class Portfolio:
         self._positions: dict[Asset, Position] =  {}
 
         self._cash = initial_capital
+        self._cash_flows:list = []
 
+    @property
+    def cash_flows(self) -> list: 
+        return self._cash_flows.copy()
 
     @property
     def name(self) -> str:
@@ -133,12 +137,15 @@ class Portfolio:
     def apply_cash_flow(self, cash_flow: CashFlow) -> None:
         if cash_flow.flow_type == "DEPOSIT":
             self._cash += cash_flow.amount
+            self._cash_flows.append(cash_flow)
 
         elif cash_flow.flow_type == "WITHDRAWAL":
             if self._cash < cash_flow.amount:
                 raise ValueError("Withdrawal exceeding available cash")
 
             self._cash -= cash_flow.amount
+            self._cash_flows.append(cash_flow)
+
 
     def active_positions(self) -> list[Position]:
         active_positions = []

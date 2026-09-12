@@ -508,3 +508,17 @@ def test_failed_withdrawal_does_not_modify_cash(position, portfolio, large_withd
     ):
         portfolio.apply_cash_flow(large_withdrawal)
     assert portfolio.cash == initial_cash
+
+def test_cash_flow_is_recorded(portfolio, cash_deposit):
+    portfolio.apply_cash_flow(cash_deposit)
+
+    assert len(portfolio.cash_flows) == 1
+    assert portfolio.cash_flows[0] == cash_deposit
+
+def test_cash_flows_returns_copy(portfolio, cash_deposit):
+    portfolio.apply_cash_flow(cash_deposit)
+
+    flows = portfolio.cash_flows
+    flows.clear()
+
+    assert len(portfolio.cash_flows) == 1
