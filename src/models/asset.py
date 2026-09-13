@@ -76,6 +76,27 @@ class Asset(ABC):
     def total_return_percent(self) -> float:
         return self.total_return() * 100
 
+    def price_at(self, timestamp: dt.datetime) -> float:
+        if not isinstance(timestamp, dt.datetime):
+            raise TypeError("timestamp must be a datetime")
+        
+        latest_price = None
+        
+        for time, price in self._prices:
+            if time == timestamp:
+                return price
+
+            elif time < timestamp:
+                latest_price = price
+
+            else:
+                break
+
+        if latest_price is not None:
+            return latest_price
+
+        raise ValueError(f"No price found for timestamp {timestamp}")     
+
     # Since every type of asset in your project is supposed to provide income, 
     # income() belongs in the Asset interface.
     @abstractmethod
@@ -91,12 +112,16 @@ class ETF(Asset):
 
 class Bond(Asset):
     pass
-
+price_history = [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
 # error will show cause we change the class into abstract class
 # apple = Asset(
 #     "AAPL",
 #     "Apple Inc.",
-#     [100, 105, 110]
+#     price_history
 # )
 
 # # print(apple.ticker)

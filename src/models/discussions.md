@@ -516,3 +516,12 @@ TWR
 ===========================================================
 
 ==================CashFlow=================
+
+copy asset test file to chat then tell all test are passed and asked what next
+
+=================================
+timestamp
+
+The key rule is:
+
+Return the latest price whose timestamp is less than or equal to the requested timestamp.

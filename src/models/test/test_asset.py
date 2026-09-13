@@ -105,3 +105,40 @@ def test_price_history_must_be_chronological():
                 "Technology",
                 2.0
             )
+
+def test_price_at_exact_timestamp(asset):
+    assert asset.price_at((dt.datetime(2026, 1, 3))) == 110
+
+def test_price_at_invalid_timestamp(asset):
+    with pytest.raises(
+        TypeError,
+        match= "timestamp must be a datetime"
+    ):
+        asset.price_at((2026, 1, 3))
+
+def test_price_at_timestamp_not_found(asset):
+    timestamp = dt.datetime(2025, 1, 4)
+    with pytest.raises(
+        ValueError,
+        match= f"No price found for timestamp {timestamp}"
+    ):
+        asset.price_at(timestamp)
+
+def test_price_at_timestamp_between_prices(asset):
+    timestamp = dt.datetime(2026, 1, 2, 12)
+
+    assert asset.price_at(timestamp) == 105
+
+def test_price_at_after_last_price(asset):
+    timestamp = dt.datetime(2026, 1, 4)
+
+    assert asset.price_at(timestamp) == 110
+
+def test_price_at_before_first_price(asset):
+    timestamp = dt.datetime(2025, 12, 31)
+
+    with pytest.raises(
+        ValueError,
+        match=f"No price found for timestamp {timestamp}"
+    ):
+        asset.price_at(timestamp)
