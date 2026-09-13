@@ -525,3 +525,15 @@ timestamp
 The key rule is:
 
 Return the latest price whose timestamp is less than or equal to the requested timestamp.
+
+==========================
+Asset
+ └── price_at(timestamp)
+          ↓
+      historical price
+          ↓
+Position
+ └── value_at(timestamp)
+          ↓
+    quantity × price
+    

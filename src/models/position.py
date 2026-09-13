@@ -1,6 +1,7 @@
 from asset import Asset
 from stock import Stock
 from transaction import Transaction
+import datetime as dt
 
 class Position:
     def __init__(
@@ -57,6 +58,10 @@ class Position:
     def income(self) -> float:
         return self.quantity * self.asset.income()
 
+    def value_at(self, timestamp: dt.datetime) -> float:
+        price = self.asset.price_at(timestamp)
+
+        return self.quantity * price
 
     def apply_transaction(self, transaction: Transaction) -> None:
         if transaction.asset != self.asset:
@@ -86,12 +91,17 @@ class Position:
             self._realized_pnl += realized_pnl
 
        
-    
+
+price_history = [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
 
 apple = Stock(
     "AAPL",
     "Apple Inc.",
-    [100, 105, 110],
+    price_history,
     "Technology",
     2.0
 )

@@ -4,22 +4,31 @@ from position import Position
 from transaction import Transaction
 import pytest
 
+import datetime as dt
+
 @pytest.fixture
-def asset():
+def price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
+@pytest.fixture
+def asset(price_history):
     return Stock(
         "AAPL",
         "Apple Inc.",
-        [100, 105, 110],
+        price_history,
         "Technology",
         2.0
     )
 
 @pytest.fixture
-def other_asset():
+def other_asset(price_history):
     return Stock(
         "MSFT",
         "Microsoft Corp.",
-        [200, 205, 210],
+        price_history,
         "Technology",
         2.0
     )
@@ -205,3 +214,35 @@ def test_is_active_after_full_sell(asset, position):
 
 def test_is_active_initially_true(position):
     assert position.is_active is True
+
+
+def test_value_at_with_exact_timestamp(position):
+    timestamp = dt.datetime(2026, 1, 3)
+
+    assert position.value_at(timestamp) == 11000
+
+def test_value_at_timestamp_between_prices(position):
+    timestamp = dt.datetime(2026, 1, 2, 12)
+
+    assert position.value_at(timestamp) == 10500
+
+def test_value_at_after_last_price(position):
+    timestamp = dt.datetime(2026, 1, 4)
+
+    assert position.value_at(timestamp) == 11000
+
+def test_value_at_invalid_timestamp(position):
+    with pytest.raises(
+        TypeError,
+        match= "timestamp must be a datetime"
+    ):
+        position.value_at((2026, 1, 3))
+
+def test_value_at_before_first_price(position):
+    timestamp = dt.datetime(2025, 12, 31)
+
+    with pytest.raises(
+        ValueError,
+        match=f"No price found for timestamp {timestamp}"
+    ):
+        position.value_at(timestamp)
