@@ -1,11 +1,12 @@
 from asset import Asset
+import datetime as dt
 # from stock import Stock
 
 class ETF(Asset):
     def __init__(self, 
                  ticker: str, 
                  name: str, 
-                 prices: list[float], 
+                 prices: list[tuple[dt.datetime, float]], 
                  expense_ratio: float,
                  annual_distribution: float) -> None:
         super().__init__(ticker, name, prices)
@@ -41,10 +42,15 @@ class ETF(Asset):
 #     "Technology",
 # )
 
+spy_price_history = [
+    (dt.datetime(2026, 1, 1), 500),
+    (dt.datetime(2026, 1, 2), 510),
+    (dt.datetime(2026, 1, 3), 520)]
+
 sp500 = ETF(
     "SPY",
     "SPDR S&P 500 ETF",
-    [500, 510, 520],
+    spy_price_history,
     0.0945,
     7.00
 )

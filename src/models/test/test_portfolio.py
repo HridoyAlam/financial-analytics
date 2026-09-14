@@ -6,30 +6,63 @@ from cash_flow import CashFlow
 from bond import Bond
 from etf import ETF
 import pytest
+import datetime as dt
+
 @pytest.fixture
-def asset():
+def apple_price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
+
+@pytest.fixture
+def msft_price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 200),
+    (dt.datetime(2026, 1, 2), 205),
+    (dt.datetime(2026, 1, 3), 210),
+]
+
+@pytest.fixture
+def spy_price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 500),
+    (dt.datetime(2026, 1, 2), 510),
+    (dt.datetime(2026, 1, 3), 520),
+]
+
+@pytest.fixture
+def us10y_price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 98),
+    (dt.datetime(2026, 1, 2), 99),
+    (dt.datetime(2026, 1, 3), 100),
+]
+@pytest.fixture
+def apple_asset(apple_price_history):
     return Stock(
         "AAPL",
         "Apple Inc.",
-        [100, 105, 110],
+        apple_price_history,
         "Technology",
         2.0
     )
 
 @pytest.fixture
-def other_asset():
+def msft_asset(msft_price_history):
     return Stock(
         "MSFT",
         "Microsoft Corp.",
-        [200, 205, 210],
+        msft_price_history,
         "Technology",
         2.0
     )
 
 @pytest.fixture
-def position(asset):
+def position(apple_asset):
     return Position(
-            asset,
+            apple_asset,
             quantity=100,
             average_cost=200
     )
@@ -68,16 +101,16 @@ def test_invalid_initial_capital(initial_capital):
             initial_capital
         )
 
-def test_add_position(portfolio,asset, position):
+def test_add_position(portfolio,apple_asset, position):
     portfolio.add_position(position)
 
-    assert portfolio.positions[asset] == position
+    assert portfolio.positions[apple_asset] == position
 
-def test_add_duplicate_asset(portfolio,asset, position):
+def test_add_duplicate_asset(portfolio,apple_asset, position):
     portfolio.add_position(position)
 
     duplicate_position = Position(
-        asset,
+        apple_asset,
         quantity=50,
         average_cost=105
     )
@@ -115,26 +148,26 @@ def test_total_cost(portfolio, position):
     # Assert
     assert  value == 20000
 
-"""
-Market Value = 100 × 110 = 11,000
-Cost Basis   = 100 × 200 = 20,000
+# """
+# Market Value = 100 × 110 = 11,000
+# Cost Basis   = 100 × 200 = 20,000
 
-P&L = 11,000 - 20,000
-    = -9,000
-"""
+# P&L = 11,000 - 20,000
+#     = -9,000
+# """
 def test_total_pnl(portfolio, position):
     portfolio.add_position(position)
     
     value = portfolio.total_pnl()
     assert  value == -9000
 
-"""
-P&L        = -9,000
-Total cost = 20,000
+# """
+# P&L        = -9,000
+# Total cost = 20,000
 
-Return = -9,000 / 20,000
-       = -0.45   
-"""
+# Return = -9,000 / 20,000
+#        = -0.45   
+# """
  
 def test_total_return(portfolio, position):
     portfolio.add_position(position)
@@ -152,12 +185,12 @@ def test_total_income_empty_portfolio(portfolio):
     value = portfolio.total_income()
     assert  value == 0.0
 
-def test_total_income(portfolio, position):
+def test_total_income(portfolio, position, spy_price_history, us10y_price_history):
 
     sp500 = ETF(
                 "SPY",
                 "SPDR S&P 500 ETF",
-                [500, 510, 520],
+                spy_price_history,
                 0.0945,
                 7.00
             )
@@ -165,7 +198,7 @@ def test_total_income(portfolio, position):
     bond  = Bond(
             "US10Y",
             "US Treasury 10-Year Bond",
-            [98, 99, 100],
+            us10y_price_history,
             1000,
             4.25,
             10
@@ -187,18 +220,18 @@ def test_total_income(portfolio, position):
     portfolio.add_position(position)
     assert portfolio.total_income() == pytest.approx(1120.0)
 
-def test_allocation(portfolio, asset, position):
+def test_allocation(portfolio, apple_asset, position):
     portfolio.add_position(position)
-    value = portfolio.allocation(asset)
+    value = portfolio.allocation(apple_asset)
 
     assert value == pytest.approx(20000 / 30000 *100)
 
-def test_allocation_asset_not_found(portfolio, asset):
+def test_allocation_asset_not_found(portfolio, apple_asset):
     with pytest.raises(
         ValueError,
         match= "Asset not found in portfolio"
     ):
-        portfolio.allocation(asset)
+        portfolio.allocation(apple_asset)
 
 def test_available_cash(portfolio, position):
     portfolio.add_position(position)
@@ -207,42 +240,44 @@ def test_available_cash(portfolio, position):
 def test_available_cash_empty_portfolio( portfolio):
     assert portfolio.available_cash() == portfolio.initial_capital
 
-def test_remove_position(portfolio, asset, position):
+def test_remove_position(portfolio, apple_asset, position):
     portfolio.add_position(position)
-    portfolio.remove_position(asset)
+    portfolio.remove_position(apple_asset)
     assert portfolio.positions == {}
 
-def test_remove_position_asset_not_found(portfolio, asset):
+def test_remove_position_asset_not_found(portfolio, apple_asset):
     with pytest.raises(
         ValueError,
         match= "Asset not found in portfolio"
         ):
-            portfolio.remove_position(asset)
+            portfolio.remove_position(apple_asset)
     
 
-def test_available_cash_after_remove(portfolio, asset, position):
+def test_available_cash_after_remove(portfolio, apple_asset, position):
     portfolio.add_position(position)
 
-    portfolio.remove_position(asset)
+    portfolio.remove_position(apple_asset)
 
     assert portfolio.available_cash() == pytest.approx(10000.0)
 
-def test_position_weight(portfolio, position, asset):
+def test_position_weight(portfolio, position, apple_asset):
     portfolio.add_position(position)
-    assert portfolio.position_weight(asset) == pytest.approx(100.0)
+    assert portfolio.position_weight(apple_asset) == pytest.approx(100.0)
 
-def test_position_weight_asset_not_found(portfolio, asset):
+def test_position_weight_asset_not_found(portfolio, apple_asset):
     with pytest.raises(
         ValueError,
         match= "Asset not found in portfolio"
         ):
-        portfolio.position_weight(asset)
+        portfolio.position_weight(apple_asset)
+
+
 @pytest.fixture
-def sp500():
+def sp500(spy_price_history):
     return ETF(
         "SPY",
         "SPDR S&P 500 ETF",
-        [500, 510, 520],
+        spy_price_history,
         0.0945,
         7.00
     )
@@ -253,26 +288,26 @@ def sp_position(sp500):
             quantity=10,
             average_cost=500
     )
-def test_position_weight_multiple_positions(sp_position, portfolio, position, asset):
+def test_position_weight_multiple_positions(sp_position, portfolio, position, apple_asset):
     
     portfolio.add_position(position)       # 20,000
     portfolio.add_position(sp_position)   # 5,000
     # appl + spy cost = 20,000 + 5000 = 25,000 
     # appl weight = 20,000/25,000 * 100 = 80%
-    assert portfolio.position_weight(asset) == pytest.approx(80.0)
+    assert portfolio.position_weight(apple_asset) == pytest.approx(80.0)
 
 @pytest.fixture
-def buy_transaction(asset):
+def buy_transaction(apple_asset):
     return Transaction(
-        asset,
+        apple_asset,
         "BUY",
         50,
         180
     )
 @pytest.fixture
-def sell_transaction(asset):
+def sell_transaction(apple_asset):
     return Transaction(
-        asset,
+        apple_asset,
         "SEll",
         50,
         220
@@ -293,9 +328,9 @@ def test_portfolio_apply_transaction_sell(sell_transaction, position, portfolio)
     assert position.quantity == 50
     assert position.realized_pnl == pytest.approx(1000.0)
 
-def test_portfolio_apply_transaction_sell_more(asset, position, portfolio):
+def test_portfolio_apply_transaction_sell_more(apple_asset, position, portfolio):
     transaction = Transaction(
-        asset,
+        apple_asset,
         "SEll",
         110,
         220
@@ -310,8 +345,8 @@ def test_portfolio_apply_transaction_sell_more(asset, position, portfolio):
 
     
 
-def test_portfolio_apply_transaction_invalid_asset(other_asset, portfolio):
-    transaction = Transaction(other_asset, "BUY", 50, 220)
+def test_portfolio_apply_transaction_invalid_asset(msft_asset, portfolio):
+    transaction = Transaction(msft_asset, "BUY", 50, 220)
     with pytest.raises(
         ValueError,
         match="Asset not found in portfolio"
@@ -341,9 +376,9 @@ def test_active_positions(portfolio, position, sp_position):
     assert portfolio.active_positions() == [position, sp_position]
 
 @pytest.fixture
-def asset_sell(asset):
+def asset_sell(apple_asset):
     return Transaction(
-            asset,
+            apple_asset,
             "SEll",
             100,
             220
@@ -435,45 +470,41 @@ def test_realized_pnl_multiple_positions(
     assert portfolio.realized_pnl() == 750
 
 
-def test_realized_pnl_closed_position(
-    portfolio,
-    position,
-    asset_sell,
-       
-):
+def test_realized_pnl_closed_position(portfolio, position, asset_sell):
     portfolio.add_position(position)       
     portfolio.apply_transaction(asset_sell)
 
     assert position.is_active is False
     assert portfolio.realized_pnl() == 2000
 
-def combined_pnl(
-    portfolio,
-    position,
-    sell_transaction
-    ):
+def test_combined_pnl(portfolio, position, sell_transaction):
     portfolio.add_position(position)
     portfolio.apply_transaction(sell_transaction)
 
-    assert portfolio.total_return_pnl() == -3500
+    assert portfolio.combined_pnl() == -3500
 
 @pytest.fixture
 def cash_withdraw():
     return CashFlow(
-        5000,
-        "WITHDRAWal"
+            5000,
+        "WITHDRAWal",
+        dt.datetime(2026, 1, 1)
+
     )
 @pytest.fixture
 def cash_deposit():
     return CashFlow(
         5000,
-        "DEPOSIT"
+        "DEPOSIT",
+        dt.datetime(2026, 1, 1)
+
     )
 @pytest.fixture
 def large_withdrawal():
     return CashFlow(
         15000,
-        "WITHDRAWal"
+        "WITHDRAWal",
+            dt.datetime(2026, 1, 1)
     )
 def test_apply_cash_flow_withdrawal(position, portfolio, cash_withdraw):
     portfolio.add_position(position)  
@@ -522,3 +553,100 @@ def test_cash_flows_returns_copy(portfolio, cash_deposit):
     flows.clear()
 
     assert len(portfolio.cash_flows) == 1
+
+# after apply cash updated with chronological order
+def test_cash_flow_must_be_chronological(portfolio, cash_deposit):
+    portfolio.apply_cash_flow(cash_deposit)
+
+    cash_deposit_prev = CashFlow(
+        500,
+        "DEPOSIT",
+        dt.datetime(2025, 1, 5)
+    )
+    with pytest.raises(
+        ValueError,
+        match= "Cash flow timestamp must be later than the previous cash flow"
+    ):
+        portfolio.apply_cash_flow(cash_deposit_prev)
+
+def test_cash_flow_cannot_have_same_timestamp(portfolio, cash_deposit):
+    portfolio.apply_cash_flow(cash_deposit)
+
+    cash_withdraw = CashFlow(
+            500,
+            "WITHDRAWAL",
+            dt.datetime(2026, 1, 1)
+        )
+    with pytest.raises(
+            ValueError,
+            match= "Cash flow timestamp must be later than the previous cash flow"
+        ):
+            portfolio.apply_cash_flow(cash_withdraw)
+def test_cash_flow_but_have_timestamp_one_min(portfolio, cash_deposit):
+    portfolio.apply_cash_flow(cash_deposit)
+
+    cash_withdraw = CashFlow(
+            500,
+            "WITHDRAWAL",
+            dt.datetime(2026, 1, 1, 1)
+        )
+
+    portfolio.apply_cash_flow(cash_withdraw)
+
+    assert portfolio.cash == 34500
+
+# # after timestamp
+
+def test_value_at_with_exact_timestamp(position, portfolio):
+    portfolio.add_position(position)
+    timestamp = dt.datetime(2026, 1, 3)
+
+    assert portfolio.value_at(timestamp) == 21000
+
+def test_value_at_timestamp_between_prices(position, portfolio):
+    portfolio.add_position(position)
+    timestamp = dt.datetime(2026, 1, 2, 12)
+
+    assert portfolio.value_at(timestamp) == 10500 + portfolio.cash
+
+def test_value_at_after_last_price(position, portfolio):
+    portfolio.add_position(position)
+    timestamp = dt.datetime(2026, 1, 4)
+
+    assert portfolio.value_at(timestamp) == 21000
+
+def test_value_at_invalid_timestamp(position, portfolio):
+    portfolio.add_position(position)
+    with pytest.raises(
+        TypeError,
+        match= "timestamp must be a datetime"
+    ):
+        portfolio.value_at((2026, 1, 3))
+
+def test_value_at_before_first_price(position, portfolio):
+    portfolio.add_position(position)
+    timestamp = dt.datetime(2025, 12, 31)
+
+    with pytest.raises(
+        ValueError,
+        match=f"No price found for timestamp {timestamp}"
+    ):
+        portfolio.value_at(timestamp)
+
+def test_value_at_with_multiple_positions(position, sp_position, portfolio):
+    portfolio.add_position(position)
+    portfolio.add_position(sp_position)
+    timestamp = dt.datetime(2026, 1, 3)
+    # print("cash:", portfolio.cash)
+    # print("position value:", position.value_at(timestamp))
+    # print("sp value:", sp_position.value_at(timestamp))
+
+    assert portfolio.value_at(timestamp) == (
+    11000 + 5200 + portfolio.cash)
+
+def test_value_at_includes_cash(position, portfolio):
+    portfolio.add_position(position)
+
+    timestamp = dt.datetime(2026, 1, 3)
+
+    assert portfolio.value_at(timestamp) == 11000 + portfolio.cash

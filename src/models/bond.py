@@ -1,9 +1,10 @@
 from asset import Asset
+import datetime as dt
 class Bond(Asset):
     def __init__(self, 
                  ticker: str, 
                  name: str, 
-                 prices: list[float],
+                prices: list[tuple[dt.datetime, float]],
                 face_value: float,
                 coupon_rate: float,
                 maturity_years: float
@@ -44,14 +45,20 @@ class Bond(Asset):
     def income(self) -> float:
         return self.annual_coupon_payment()
 
-# bond  = Bond(
-#     "US10Y",
-#     "US Treasury 10-Year Bond",
-#     [98, 99, 100],
-#     1000,
-#     4.25,
-#     10
-# )
+us10y_prices = [
+    (dt.datetime(2026, 1, 1), 98),
+    (dt.datetime(2026, 1, 2), 99),
+    (dt.datetime(2026, 1, 3), 100),
+]
+
+bond  = Bond(
+    "US10Y",
+    "US Treasury 10-Year Bond",
+    us10y_prices,
+    1000,
+    4.25,
+    10
+)
 # print(bond)
 # print(bond.current_price())
 # print(bond.total_return())

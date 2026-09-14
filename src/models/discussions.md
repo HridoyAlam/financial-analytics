@@ -528,12 +528,37 @@ Return the latest price whose timestamp is less than or equal to the requested t
 
 ==========================
 Asset
- └── price_at(timestamp)
-          ↓
-      historical price
-          ↓
+└── price_at(timestamp)
+↓
+historical price
+↓
 Position
- └── value_at(timestamp)
-          ↓
-    quantity × price
-    
+└── value_at(timestamp)
+↓
+quantity × price
+
+===============================
+===========Portfolio.value_at(timestamp)===============
+"What are all my positions worth right now?"
+portfolio.current_value()
+
+"What were all my positions worth at this point in history?"
+portfolio.value_at(timestamp)
+
+AAPL
+quantity = 100
+Jan 1 → $100
+Jan 2 → $105
+Jan 3 → $110
+
+MSFT
+quantity = 50
+Jan 1 → $200
+Jan 2 → $205
+Jan 3 → $210
+
+At Jan 2
+AAPL = 100 × 105 = 10,500
+MSFT = 50 × 205 = 10,250
+───────
+Portfolio = 20,750

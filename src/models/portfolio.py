@@ -3,6 +3,7 @@ from stock import Stock
 from position import Position
 from transaction import Transaction
 from cash_flow import CashFlow
+import datetime as dt
 class Portfolio:
     def __init__(self, name: str, initial_capital: float):
 
@@ -60,6 +61,27 @@ class Portfolio:
             total += position.market_value()
 
         return total
+    
+    # after timestamp
+    def value_at(self, timestamp: dt.datetime) -> float:
+        total = self._cash
+
+        for position in self._positions.values():
+            total += position.value_at(timestamp)
+
+        return total
+
+    def cash_at(self, timestamp: dt.datetime) -> float:
+        total = self.initial_capital
+
+        for cash_flow in self._cash_flows:
+            if cash_flow.timestamp <= timestamp:
+                if cash_flow.flow_type == "DEPOSIT":
+                    total += cash_flow.amount
+                elif cash_flow.flow_type == "WITHDRAWAL":
+                    total -= cash_flow.amount
+        return total
+        
 
     def total_pnl(self) -> float:
         total = 0.0
@@ -135,6 +157,15 @@ class Portfolio:
             self._cash -= transaction.total_value()
 
     def apply_cash_flow(self, cash_flow: CashFlow) -> None:
+
+        if self._cash_flows:    
+            last_cash_flow = self._cash_flows[-1]
+            last_cash_flow_time = last_cash_flow.timestamp
+
+            if cash_flow.timestamp <= last_cash_flow_time:
+                raise ValueError("Cash flow timestamp must be later than the previous cash flow")
+            
+
         if cash_flow.flow_type == "DEPOSIT":
             self._cash += cash_flow.amount
             self._cash_flows.append(cash_flow)
@@ -145,6 +176,9 @@ class Portfolio:
 
             self._cash -= cash_flow.amount
             self._cash_flows.append(cash_flow)
+            
+
+
 
 
     def active_positions(self) -> list[Position]:
@@ -173,12 +207,17 @@ class Portfolio:
     def combined_pnl(self) -> float:
         return self.realized_pnl() + self.total_pnl()
 
-    
+
+apple_price_history = [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
     
 apple = Stock(
         "AAPL",
         "Apple Inc.",
-        [100, 105, 110],
+        apple_price_history,
         "Technology",
         2.0
     )
@@ -205,8 +244,8 @@ print(f"available_cash:{portfolio.available_cash()}")
 
 # portfolio.remove_position(apple)
 # print(portfolio.available_cash())
-print(portfolio.position_weight(apple))
-
+# print(portfolio.position_weight(apple))
+# print(portfolio.cash_at((dt.datetime(2026, 1, 1))))
 # buy_transaction = Transaction(
 #     apple,
 #     "BUY",
@@ -215,7 +254,7 @@ print(portfolio.position_weight(apple))
 # )
 # portfolio.apply_transaction(buy_transaction)
 # print(f"after buy available_cash:{portfolio.available_cash()}")
-
+# print(portfolio.cash_at((dt.datetime(2026, 1, 3))))
 
 # sell_transaction = Transaction(
 #     apple,
