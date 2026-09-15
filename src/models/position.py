@@ -26,6 +26,8 @@ class Position:
 
         self._realized_pnl = 0.0
 
+        self._quantity_history: list[tuple[dt.datetime, float]] = []
+
     @property
     def asset(self) -> Asset:
         return self._asset
@@ -45,6 +47,10 @@ class Position:
     @property
     def is_active(self) -> bool:
         return self.quantity > 0
+
+    @property
+    def quantity_history(self) -> list[tuple[dt.datetime, float]]:
+        return self._quantity_history.copy()
 
     def cost_basis(self) -> float:
         return self.quantity * self.average_cost
@@ -90,6 +96,13 @@ class Position:
             self._quantity -= transaction.quantity
             self._realized_pnl += realized_pnl
 
+    def quantity_at(self, timestamp:dt.datetime) -> float:
+        # return self._quantity_history[timestamp]
+        pass
+        
+
+    def initialize_history(self, timestamp:dt.datetime) -> None:
+        self._quantity_history.append((timestamp, self.quantity))
        
 
 price_history = [

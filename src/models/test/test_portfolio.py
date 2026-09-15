@@ -70,7 +70,8 @@ def position(apple_asset):
 def portfolio():
     return Portfolio(
             "My Portfolio",
-            30000
+            30000,
+            dt.datetime(2026, 1, 1)
         )
 
 
@@ -78,6 +79,7 @@ def test_portfolio_creation(portfolio):
     assert portfolio.name == "My Portfolio"
     assert portfolio.initial_capital == 30000
     assert portfolio.positions == {}
+    assert portfolio.inception_timestamp == dt.datetime(2026,1,1)
 
 @pytest.mark.parametrize("name", ["", " "])
 def test_invalid_portfolio_name(name):
@@ -87,7 +89,8 @@ def test_invalid_portfolio_name(name):
     ):
         Portfolio(
             name,
-            20000
+            20000,
+            dt.datetime(2026, 1, 1)
         )
 
 @pytest.mark.parametrize("initial_capital", [0, -100])
@@ -98,7 +101,18 @@ def test_invalid_initial_capital(initial_capital):
     ):
         Portfolio(
             "My Portfolio",
-            initial_capital
+            initial_capital,
+            dt.datetime(2026, 1, 1)
+        )
+def test_invalid_datetime():
+    with pytest.raises(
+        ValueError,
+        match="inception_timestamp must be a datetime"
+    ):
+        Portfolio(
+            "My Portfolio",
+            30000,
+            (2026, 1, 1)
         )
 
 def test_add_position(portfolio,apple_asset, position):

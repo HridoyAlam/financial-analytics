@@ -5,7 +5,13 @@ from transaction import Transaction
 from cash_flow import CashFlow
 import datetime as dt
 class Portfolio:
-    def __init__(self, name: str, initial_capital: float):
+    def __init__(self, 
+                 name: str, 
+                 initial_capital: float, 
+                 inception_timestamp: dt.datetime) -> None:
+
+        if not isinstance(inception_timestamp, dt.datetime):
+            raise ValueError("inception_timestamp must be a datetime")
 
         if not name or not name.strip():
             raise ValueError("Name can't be empty")
@@ -20,9 +26,14 @@ class Portfolio:
         self._initial_cash = initial_capital
         self._cash = initial_capital
 
+        self._inception_timestamp = inception_timestamp
+
         self._cash_flows:list = []
         self._transactions = []
 
+    @property
+    def inception_timestamp(self) -> dt.datetime:
+        return self._inception_timestamp
 
     @property
     def cash_flows(self) -> list: 
@@ -73,13 +84,7 @@ class Portfolio:
         return total
     
     # after timestamp
-    def value_at(self, timestamp: dt.datetime) -> float:
-        total = self._cash
 
-        for position in self._positions.values():
-            total += position.value_at(timestamp)
-
-        return total
 
     def cash_at(self, timestamp: dt.datetime) -> float:
         total = self._initial_cash
@@ -105,7 +110,14 @@ class Portfolio:
 
         return total
         
+    def value_at(self, timestamp: dt.datetime) -> float:
+        total = self.cash_at(timestamp)
 
+        for position in self._positions.values():
+            total += position.value_at(timestamp)
+
+        return total
+    
     def total_pnl(self) -> float:
         total = 0.0
 
@@ -260,7 +272,11 @@ apple_position = Position(
     )
 
 
-portfolio = Portfolio("Tech Portfolio", 30000)
+portfolio = Portfolio(
+    "Tech Portfolio", 
+    30000,
+    dt.datetime(2026,1,1)
+    )
 
 portfolio.add_position(apple_position)
 

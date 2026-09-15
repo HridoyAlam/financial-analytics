@@ -33,7 +33,8 @@ def position(asset):
 def portfolio():
     return Portfolio(
             "My Portfolio",
-            30000
+            30000,
+            dt.datetime(2026, 1, 1)
         )
 @pytest.mark.parametrize("param", ["buy", "Buy", "BUY"])
 def test_valid_buy_transaction(asset, param):

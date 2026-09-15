@@ -110,7 +110,8 @@ def test_apply_transaction_buy(asset, position):
                 asset,
                 "Buy",
                 50,
-                220
+                220,
+                dt.datetime(2026,1,1)
     )
     position.apply_transaction(transaction)
     assert position.average_cost == pytest.approx(206.66666666666666)
@@ -122,7 +123,7 @@ def test_apply_transaction_sell(asset, position):
                 "Sell",
                 50,
                 220,
-                
+                dt.datetime(2026,1,1)
     )
     position.apply_transaction(transaction)
     assert position.quantity == pytest.approx(50)
@@ -134,7 +135,7 @@ def test_apply_transaction_extra_sell(asset, position):
                 "Sell",
                 20,
                 220,
-                
+                dt.datetime(2026,1,1)
     )
 
     position.apply_transaction(transaction1)
@@ -145,7 +146,7 @@ def test_apply_transaction_extra_sell(asset, position):
                 "Sell",
                 30,
                 180,
-                
+                dt.datetime(2026,1,1)
     )
     position.apply_transaction(transaction2)
     assert position.realized_pnl == pytest.approx(-200)
@@ -158,7 +159,8 @@ def test_apply_transaction_invalid_asset(other_asset, position):
                     other_asset,
                     "Buy",
                     50,
-                    220
+                    220,
+                    dt.datetime(2026,1,1)
         )
     with pytest.raises(
         ValueError,
@@ -172,7 +174,8 @@ def test_apply_transaction_over_sell(asset, position):
                     asset,
                     "SELL",
                     150,
-                    220
+                    220,
+                    dt.datetime(2026,1,1)
         )
     with pytest.raises(
         ValueError,
@@ -185,7 +188,8 @@ def test_apply_transaction_final_sell_edge_case(asset, position):
                     asset,
                     "SELL",
                     100,
-                    220
+                    220,
+                    dt.datetime(2026,1,1)
         )
     position.apply_transaction(transaction)
     assert  position.quantity ==  0
@@ -197,7 +201,8 @@ def test_is_active_after_partial_sell(asset, position):
                     asset,
                     "SELL",
                     30,
-                    220
+                    220,
+                    dt.datetime(2026,1,1)
         )
     position.apply_transaction(transaction)
     assert  position.is_active is True
@@ -207,7 +212,8 @@ def test_is_active_after_full_sell(asset, position):
                     asset,
                     "SELL",
                     100,
-                    220
+                    220,
+                    dt.datetime(2026,1,1)
         )
     position.apply_transaction(transaction)
     assert  position.is_active is False
@@ -246,3 +252,24 @@ def test_value_at_before_first_price(position):
         match=f"No price found for timestamp {timestamp}"
     ):
         position.value_at(timestamp)
+
+def test_initialize_quantity_history(position):
+    timestamp = dt.datetime(2026, 1, 1)
+
+    position.initialize_history(timestamp)
+
+    assert position.quantity_history == [
+        (timestamp, 100)
+    ]
+
+def test_quantity_history_returns_copy(position):
+    timestamp = dt.datetime(2026, 1, 1)
+
+    position.initialize_history(timestamp)
+
+    history = position.quantity_history
+    history.clear()
+
+    assert position.quantity_history == [
+        (timestamp, 100)
+    ]

@@ -619,3 +619,24 @@ historical cash
 \_cash → current cash
 
 ===========================================================
+Portfolio
+│
+┌────────────┴────────────┐
+│ │
+cash_at() positions
+│ │
+replay cash events Position.value_at()
+│ │
+│ historical quantity
+│ +
+│ historical asset price
+│
+└────────────┬────────────┘
+│
+value_at()
+│
+▼
+historical portfolio value
+│
+▼
+TWR
