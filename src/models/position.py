@@ -148,20 +148,20 @@ position = Position(
     average_cost=200
 )
 
-buy_transaction = Transaction(
-    apple,
-    "Buy",
-    50,
-    220,
-    dt.datetime(2026, 1, 5)
-)
-sell_transaction = Transaction(
-    apple,
-    "Sell",
-    30,
-    220,
-    dt.datetime(2026, 1, 6)
-)
+# buy_transaction = Transaction(
+#     apple,
+#     "Buy",
+#     50,
+#     220,
+#     dt.datetime(2026, 1, 5)
+# )
+# sell_transaction = Transaction(
+#     apple,
+#     "Sell",
+#     30,
+#     220,
+#     dt.datetime(2026, 1, 6)
+# )
 
 
 # print(position.asset)
@@ -177,7 +177,35 @@ sell_transaction = Transaction(
 # print(position.quantity)
 # print(position.average_cost)
 
-position.apply_transaction(sell_transaction)
-print(position.quantity)
-print(position.average_cost)
-print(position.realized_pnl)
+# position.apply_transaction(sell_transaction)
+# print(position.quantity)
+# print(position.average_cost)
+# print(position.realized_pnl)
+
+# buy1 = Transaction(
+#                 apple,
+#                 "BUY",
+#                 10,
+#                 200,
+#                 dt.datetime(2026,1,2)
+#     )
+# buy2 = Transaction(
+#                 apple,
+#                 "BUY",
+#                 15,
+#                 200,
+#                 dt.datetime(2026,1,3)
+#     )
+# sell = Transaction(
+#                 apple,
+#                 "SELL",
+#                 20,
+#                 200,
+#                 dt.datetime(2026,1,4)
+#     )
+
+# position.apply_transaction(buy1)
+# position.apply_transaction(buy2)
+# position.apply_transaction(sell)
+
+# print(position.quantity_history)

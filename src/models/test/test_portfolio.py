@@ -194,7 +194,10 @@ def test_total_return_empty_portfolio(portfolio):
 
     value = portfolio.total_return()
     assert  value == 0.0
-
+# after inception timestamp
+def test_inception_timestamp(position, portfolio):
+    portfolio.add_position(position)
+    assert position.quantity_history == [(portfolio.inception_timestamp, 100)]
 # total income
 
 def test_total_income_empty_portfolio(portfolio):

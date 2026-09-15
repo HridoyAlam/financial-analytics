@@ -273,3 +273,41 @@ def test_quantity_history_returns_copy(position):
     assert position.quantity_history == [
         (timestamp, 100)
     ]
+
+def test_quantity_history_after_transactions(asset, position):
+    buy1 = Transaction(
+                asset,
+                "BUY",
+                10,
+                200,
+                dt.datetime(2026,1,2)
+    )
+    buy2 = Transaction(
+                asset,
+                "BUY",
+                15,
+                200,
+                dt.datetime(2026,1,3)
+    )
+    sell = Transaction(
+                asset,
+                "SELL",
+                20,
+                200,
+                dt.datetime(2026,1,4)
+    )
+
+    position.initialize_history(dt.datetime(2026, 1, 1))
+
+    position.apply_transaction(buy1)
+    position.apply_transaction(buy2)
+    position.apply_transaction(sell)
+
+    assert position.quantity_at(dt.datetime(2026, 1, 1)) == 100
+
+    assert position.quantity_history == [ 
+                                         (dt.datetime(2026,1,1), 100),
+                                         (dt.datetime(2026,1,2), 110),
+                                         (dt.datetime(2026,1,3), 125),
+                                         (dt.datetime(2026,1,4), 105)]
+    

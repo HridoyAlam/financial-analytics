@@ -71,6 +71,7 @@ class Portfolio:
             raise ValueError("Insufficient capital")
 
         self._positions[position.asset] = position
+        position.initialize_history(self._inception_timestamp)
 
         self._cash -= position.cost_basis()
         self._initial_cash -= position.cost_basis()
