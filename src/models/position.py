@@ -85,6 +85,7 @@ class Position:
 
             self._quantity = new_quantity
             self._average_cost = new_average_cost
+            self._quantity_history.append((transaction.timestamp, new_quantity))
 
         elif transaction.transaction_type == "SELL":
 
@@ -95,10 +96,32 @@ class Position:
 
             self._quantity -= transaction.quantity
             self._realized_pnl += realized_pnl
+            self._quantity_history.append((transaction.timestamp, self._quantity))
+
 
     def quantity_at(self, timestamp:dt.datetime) -> float:
-        # return self._quantity_history[timestamp]
-        pass
+
+        if not isinstance(timestamp, dt.datetime):
+            raise TypeError("timestamp must be a datetime")
+
+        latest_quantity = None
+
+        for time, quantity in self._quantity_history:
+            if time == timestamp:
+                return quantity
+
+            elif time < timestamp:
+                latest_quantity = quantity
+
+            else:
+                break
+
+        if latest_quantity is not None:
+
+            return latest_quantity
+        
+        raise ValueError(f"No quantity found for timestamp {timestamp}")     
+        
         
 
     def initialize_history(self, timestamp:dt.datetime) -> None:
