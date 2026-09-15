@@ -88,6 +88,9 @@ class Portfolio:
 
 
     def cash_at(self, timestamp: dt.datetime) -> float:
+        if not isinstance(timestamp, dt.datetime):
+            raise TypeError("timestamp must be a datetime")
+        
         total = self._initial_cash
 
         events = self._transactions + self._cash_flows
@@ -112,6 +115,9 @@ class Portfolio:
         return total
         
     def value_at(self, timestamp: dt.datetime) -> float:
+        if not isinstance(timestamp, dt.datetime):
+            raise TypeError("timestamp must be a datetime")
+        
         total = self.cash_at(timestamp)
 
         for position in self._positions.values():

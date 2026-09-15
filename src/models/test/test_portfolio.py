@@ -783,6 +783,84 @@ def test_value_at_includes_cash(position, portfolio):
 
     assert portfolio.value_at(timestamp) == 11000 + portfolio.cash
 
+def test_value_at_historical_scenario(position, portfolio, apple_asset):
+    portfolio.add_position(position)
+
+    assert position.quantity == 100
+    assert position.average_cost == 200
+    assert portfolio.cash == 10000
+
+    jan_2 = dt.datetime(2026, 1, 2)
+    jan_4 = dt.datetime(2026, 1, 4)
+    buy = Transaction(
+        apple_asset,
+        "BUY",
+        10,
+        210,
+        jan_2
+    )
+    portfolio.apply_transaction(buy)
+    assert portfolio.cash == 7900
+    sell = Transaction(
+            apple_asset,
+            "SELL",
+            20,
+            220,
+            jan_4
+        )
+    portfolio.apply_transaction(sell)
+
+    
+    assert portfolio.value_at(dt.datetime(2026, 1, 3)) == 17800
+    assert portfolio.value_at(dt.datetime(2026, 1, 4)) == 22200
+    assert portfolio.value_at(dt.datetime(2026, 1, 5)) == 22200
+
+def test_value_at_between_transactions(position, portfolio, apple_asset):
+
+    jan_2 = dt.datetime(2026, 1, 2)
+    jan_3 = dt.datetime(2026, 1, 3)
+    portfolio.add_position(position)
+    buy = Transaction(
+        apple_asset,
+        "BUY",
+        10,
+        210,
+        jan_2
+    )
+    portfolio.apply_transaction(buy)
+    price_on_jan_3 = apple_asset.price_at(jan_3)
+    assert position.value_at(jan_3) == 110 * price_on_jan_3
+
+def test_value_at_after_sell(position, portfolio, apple_asset):
+
+    jan_2 = dt.datetime(2026, 1, 2)
+    jan_4 = dt.datetime(2026, 1, 4)
+    jan_5 = dt.datetime(2026, 1, 5)
+
+    portfolio.add_position(position)
+
+    buy = Transaction(
+        apple_asset,
+        "BUY",
+        10,
+        110,
+        jan_2
+    )
+    sell = Transaction(
+        apple_asset,
+        "SELL",
+        20,
+        90,
+        jan_4
+    )
+    portfolio.apply_transaction(buy)
+    portfolio.apply_transaction(sell)
+    price_on_jan_5 = apple_asset.price_at(jan_5)
+    assert position.value_at(jan_5) == 90 * price_on_jan_5
+
+
+
+
 ###### cash_at
 def test_cash_at_with_exact_timestamp(position, portfolio):
     portfolio.add_position(position)
