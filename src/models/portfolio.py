@@ -17,7 +17,9 @@ class Portfolio:
         self._initial_capital = initial_capital
         self._positions: dict[Asset, Position] =  {}
 
+        self._initial_cash = initial_capital
         self._cash = initial_capital
+
         self._cash_flows:list = []
         self._transactions = []
 
@@ -58,7 +60,9 @@ class Portfolio:
             raise ValueError("Insufficient capital")
 
         self._positions[position.asset] = position
+
         self._cash -= position.cost_basis()
+        self._initial_cash -= position.cost_basis()
 
     def current_value(self) -> float:
         total = 0.0
@@ -78,14 +82,27 @@ class Portfolio:
         return total
 
     def cash_at(self, timestamp: dt.datetime) -> float:
-        total = self.initial_capital
+        total = self._initial_cash
 
-        for cash_flow in self._cash_flows:
-            if cash_flow.timestamp <= timestamp:
-                if cash_flow.flow_type == "DEPOSIT":
-                    total += cash_flow.amount
-                elif cash_flow.flow_type == "WITHDRAWAL":
-                    total -= cash_flow.amount
+        events = self._transactions + self._cash_flows
+        events.sort(key=lambda event: event.timestamp)
+
+        for event in events:
+            if event.timestamp > timestamp:
+                break
+
+            if isinstance(event, Transaction):
+                if event.transaction_type == "BUY":
+                    total -= event.quantity * event.price
+                elif event.transaction_type == "SELL":
+                    total += event.quantity * event.price
+
+            elif isinstance(event, CashFlow):
+                if event.flow_type == "DEPOSIT":
+                    total += event.amount
+                elif event.flow_type == "WITHDRAWAL":
+                    total -= event.amount
+
         return total
         
 
@@ -256,29 +273,33 @@ print(portfolio.total_income())
 print(portfolio.allocation(apple))
 print(f"available_cash:{portfolio.available_cash()}")
 
+
 # portfolio.remove_position(apple)
 # print(portfolio.available_cash())
 # print(portfolio.position_weight(apple))
 # print(portfolio.cash_at((dt.datetime(2026, 1, 1))))
-# buy_transaction = Transaction(
-#     apple,
-#     "BUY",
-#     50,
-#     180
-# )
-# portfolio.apply_transaction(buy_transaction)
+buy_transaction = Transaction(
+    apple,
+    "BUY",
+    50,
+    180,
+    (dt.datetime(2026, 1, 4))
+)
+portfolio.apply_transaction(buy_transaction)
 # print(f"after buy available_cash:{portfolio.available_cash()}")
 # print(portfolio.cash_at((dt.datetime(2026, 1, 3))))
 
-# sell_transaction = Transaction(
-#     apple,
-#     "SELL",
-#     50,
-#     220
-# )
-# portfolio.apply_transaction(sell_transaction)
+sell_transaction = Transaction(
+    apple,
+    "SELL",
+    50,
+    220,
+    (dt.datetime(2026, 1, 4))
+)
+portfolio.apply_transaction(sell_transaction)
 # print(apple_position.quantity)
 # print(apple_position.realized_pnl)
 # print(f"after sell available_cash:{portfolio.available_cash()}")
 
 
+print(portfolio.cash_at(dt.datetime(2026, 1, 5)))

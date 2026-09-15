@@ -311,7 +311,8 @@ def buy_transaction(apple_asset):
         apple_asset,
         "BUY",
         50,
-        180
+        180,
+        (dt.datetime(2026, 1, 4))
     )
 @pytest.fixture
 def sell_transaction(apple_asset):
@@ -319,7 +320,8 @@ def sell_transaction(apple_asset):
         apple_asset,
         "SEll",
         50,
-        220
+        220,
+        (dt.datetime(2026, 1, 4))
     )
 
 def test_portfolio_apply_transaction(buy_transaction, position, portfolio):
@@ -342,7 +344,8 @@ def test_portfolio_apply_transaction_sell_more(apple_asset, position, portfolio)
         apple_asset,
         "SEll",
         110,
-        220
+        220,
+        (dt.datetime(2026, 1, 4))
     )
     portfolio.add_position(position)
 
@@ -355,7 +358,8 @@ def test_portfolio_apply_transaction_sell_more(apple_asset, position, portfolio)
     
 
 def test_portfolio_apply_transaction_invalid_asset(msft_asset, portfolio):
-    transaction = Transaction(msft_asset, "BUY", 50, 220)
+    transaction = Transaction(msft_asset, 
+                              "BUY", 50, 220,(dt.datetime(2026, 1, 4)))
     with pytest.raises(
         ValueError,
         match="Asset not found in portfolio"
@@ -369,7 +373,12 @@ def test_portfolio_apply_transaction_insufficient_cash(
         position):
     
     portfolio.add_position(position)
-    transaction = Transaction(apple_asset, "BUY", 100, 220)
+    transaction = Transaction(
+                    apple_asset, 
+                    "BUY",
+                    100,
+                    220,
+                    (dt.datetime(2026, 1, 4)))
     with pytest.raises(
         ValueError,
         match="insufficient cash"
@@ -388,7 +397,8 @@ def test_portfolio_apply_transaction_insufficient_cash_check_old(
     old_average_cost = position.average_cost
     old_cash = portfolio.cash
 
-    transaction = Transaction(apple_asset, "BUY", 100, 220)
+    transaction = Transaction(apple_asset, "BUY", 100, 220, 
+                              (dt.datetime(2026, 1, 4)))
     with pytest.raises(
         ValueError,
         match="insufficient cash"
@@ -414,7 +424,8 @@ def test_portfolio_apply_transaction_insufficient_cash_check_old_new(
     print(f"old_average_cost:{old_average_cost}")
     print(f"old_cash:{old_cash}")
 
-    transaction = Transaction(apple_asset, "BUY", 10, 220)
+    transaction = Transaction(apple_asset, 
+                              "BUY", 10, 220, (dt.datetime(2026, 1, 4)))
      
     portfolio.apply_transaction(transaction)
 
@@ -433,7 +444,7 @@ def test_portfolio_apply_transaction_len_check(
     portfolio.add_position(position)
 
    
-    transaction = Transaction(apple_asset, "BUY", 10, 220)
+    transaction = Transaction(apple_asset, "BUY", 10, 220, (dt.datetime(2026, 1, 4)))
      
     portfolio.apply_transaction(transaction)
 
@@ -445,7 +456,7 @@ def test_transactions_returns_copy(
 
     portfolio.add_position(position)
 
-    transaction = Transaction(apple_asset, "BUY", 10, 220)
+    transaction = Transaction(apple_asset, "BUY", 10, 220, (dt.datetime(2026, 1, 4)))
     portfolio.apply_transaction(transaction)
 
     transactions = portfolio.transactions
@@ -479,7 +490,8 @@ def asset_sell(apple_asset):
             apple_asset,
             "SEll",
             100,
-            220
+            220,
+            (dt.datetime(2026, 1, 4))
         )
 
 @pytest.fixture
@@ -488,7 +500,8 @@ def sp500_sell(sp500):
             sp500,
             "SEll",
             10,
-            500
+            500,
+            (dt.datetime(2026, 1, 4))
         )
 
 def test_active_positions_excludes_closed_sp500_position(
@@ -559,7 +572,8 @@ def test_realized_pnl_multiple_positions(
             sp500,
             "SEll",
             5,
-            450
+            450,
+            (dt.datetime(2026, 1, 4))
         )
 
     portfolio.apply_transaction(sell_transaction) 
@@ -580,6 +594,8 @@ def test_combined_pnl(portfolio, position, sell_transaction):
     portfolio.apply_transaction(sell_transaction)
 
     assert portfolio.combined_pnl() == -3500
+
+# cash flow
 
 @pytest.fixture
 def cash_withdraw():
@@ -753,9 +769,9 @@ def test_value_at_includes_cash(position, portfolio):
 ###### cash_at
 def test_cash_at_with_exact_timestamp(position, portfolio):
     portfolio.add_position(position)
-    timestamp = dt.datetime(2026, 1, 3)
+    timestamp = dt.datetime(2026, 1, 1)
 
-    assert portfolio.cash_at(timestamp) == 30000
+    assert portfolio.cash_at(timestamp) == 10000
 
 def test_cash_at_timestamp_between_prices(
         position, 
@@ -765,6 +781,50 @@ def test_cash_at_timestamp_between_prices(
     portfolio.add_position(position)
     portfolio.apply_cash_flow(cash_deposit)
     portfolio.apply_cash_flow(large_withdrawal)
-    timestamp = dt.datetime(2026, 1, 2)
+    timestamp = dt.datetime(2026, 1, 4)
 
-    assert portfolio.cash_at(timestamp) == 20000
+    assert portfolio.cash_at(timestamp) == 0
+
+def test_cash_at_with_different_timestamp(position, portfolio, apple_asset):
+    jan_1 = dt.datetime(2026, 1, 1)
+    jan_2 = dt.datetime(2026, 1, 2)
+    jan_4 = dt.datetime(2026, 1, 4)
+    jan_5 = dt.datetime(2026, 1, 5)
+    jan_6 = dt.datetime(2026, 1, 6)
+    jan_7 = dt.datetime(2026, 1, 7)
+    jan_8 = dt.datetime(2026, 1, 8)
+
+    portfolio.add_position(position)
+
+    buy = Transaction(
+        apple_asset,
+        "BUY",
+        10,
+        200,
+        jan_2
+    )
+    portfolio.apply_transaction(buy)
+
+    deposit = CashFlow(
+        5000,
+        "DEPOSIT",
+        jan_5
+    )
+    portfolio.apply_cash_flow(deposit)
+
+    sell = Transaction(
+        apple_asset,
+        "SELL",
+        15,
+        200,
+        jan_7
+    )
+    portfolio.apply_transaction(sell)
+
+    assert portfolio.cash_at(jan_1) == 10000
+    assert portfolio.cash_at(jan_2) == 8000
+    assert portfolio.cash_at(jan_4) == 8000
+    assert portfolio.cash_at(jan_5) == 13000
+    assert portfolio.cash_at(jan_6) == 13000
+    assert portfolio.cash_at(jan_8) == 16000
+    

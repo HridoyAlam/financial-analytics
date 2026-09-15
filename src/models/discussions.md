@@ -563,6 +563,59 @@ MSFT = 50 × 205 = 10,250
 ───────
 Portfolio = 20,750
 
-================
+==================================================
+================portfolio cash_at=================
+So the core algorithm is simply:
+cash = initial_capital
 
-test_portfolio_apply_transaction_insufficient_cash_check_old check
+for every event before timestamp:
+if BUY:
+cash -= transaction value
+
+    if SELL:
+        cash += transaction value
+
+    if DEPOSIT:
+        cash += cash-flow amount
+
+    if WITHDRAWAL:
+        cash -= cash-flow amount
+
+return cash
+
+####
+
+events
+↓
+sort by timestamp
+↓
+process each event
+↓
+return historical cash
+
+Python can do the sorting with:
+events.sort(key=lambda event: event.timestamp)
+After sorting, you can check:
+if isinstance(event, Transaction):
+...
+elif isinstance(event, CashFlow):
+...
+So your mental model becomes:
+┌── Transaction ── BUY/SELL
+│
+all events ─────────┤
+│
+└── CashFlow ───── DEPOSIT/WITHDRAWAL
+↓
+sort by timestamp
+↓
+replay the history
+↓
+historical cash
+============================================================
+
+\_initial_capital → original portfolio capital
+\_initial_cash → cash at portfolio inception
+\_cash → current cash
+
+===========================================================
