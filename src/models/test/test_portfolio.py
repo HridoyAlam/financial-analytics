@@ -168,6 +168,7 @@ def test_total_pnl(portfolio, position):
 # Return = -9,000 / 20,000
 #        = -0.45   
 # """
+# total return
  
 def test_total_return(portfolio, position):
     portfolio.add_position(position)
@@ -179,6 +180,8 @@ def test_total_return_empty_portfolio(portfolio):
 
     value = portfolio.total_return()
     assert  value == 0.0
+
+# total income
 
 def test_total_income_empty_portfolio(portfolio):
 
@@ -219,7 +222,7 @@ def test_total_income(portfolio, position, spy_price_history, us10y_price_histor
     portfolio.add_position(bond_position)
     portfolio.add_position(position)
     assert portfolio.total_income() == pytest.approx(1120.0)
-
+# allocation
 def test_allocation(portfolio, apple_asset, position):
     portfolio.add_position(position)
     value = portfolio.allocation(apple_asset)
@@ -233,12 +236,16 @@ def test_allocation_asset_not_found(portfolio, apple_asset):
     ):
         portfolio.allocation(apple_asset)
 
+# available cash
+
 def test_available_cash(portfolio, position):
     portfolio.add_position(position)
     assert portfolio.available_cash() == pytest.approx(10000.0)
 
 def test_available_cash_empty_portfolio( portfolio):
     assert portfolio.available_cash() == portfolio.initial_capital
+
+# Positions
 
 def test_remove_position(portfolio, apple_asset, position):
     portfolio.add_position(position)
@@ -295,6 +302,8 @@ def test_position_weight_multiple_positions(sp_position, portfolio, position, ap
     # appl + spy cost = 20,000 + 5000 = 25,000 
     # appl weight = 20,000/25,000 * 100 = 80%
     assert portfolio.position_weight(apple_asset) == pytest.approx(80.0)
+
+# apply transaction
 
 @pytest.fixture
 def buy_transaction(apple_asset):
@@ -353,7 +362,96 @@ def test_portfolio_apply_transaction_invalid_asset(msft_asset, portfolio):
     ):
      
         portfolio.apply_transaction(transaction)
+
+def test_portfolio_apply_transaction_insufficient_cash(
+        apple_asset, 
+        portfolio,
+        position):
+    
+    portfolio.add_position(position)
+    transaction = Transaction(apple_asset, "BUY", 100, 220)
+    with pytest.raises(
+        ValueError,
+        match="insufficient cash"
+    ):
+     
+        portfolio.apply_transaction(transaction)
+
+def test_portfolio_apply_transaction_insufficient_cash_check_old(
+        apple_asset, 
+        portfolio,
+        position):
+    
+    portfolio.add_position(position)
+
+    old_quantity = position.quantity
+    old_average_cost = position.average_cost
+    old_cash = portfolio.cash
+
+    transaction = Transaction(apple_asset, "BUY", 100, 220)
+    with pytest.raises(
+        ValueError,
+        match="insufficient cash"
+    ):
+     
+        portfolio.apply_transaction(transaction)
         
+    assert position.quantity == old_quantity
+    assert position.average_cost == old_average_cost
+    assert portfolio.cash == old_cash
+def test_portfolio_apply_transaction_insufficient_cash_check_old_new(
+        apple_asset, 
+        portfolio,
+        position):
+    
+    portfolio.add_position(position)
+
+    old_quantity = position.quantity
+    old_average_cost = position.average_cost
+    old_cash = portfolio.cash
+
+    print(f"old_quantity:{old_quantity}")
+    print(f"old_average_cost:{old_average_cost}")
+    print(f"old_cash:{old_cash}")
+
+    transaction = Transaction(apple_asset, "BUY", 10, 220)
+     
+    portfolio.apply_transaction(transaction)
+
+    new_quantity = position.quantity
+    new_average_cost = position.average_cost
+    new_cash = portfolio.cash
+
+    print(f"new_quantity:{new_quantity}")
+    print(f"new_average_cost:{new_average_cost}")
+    print(f"new_cash:{new_cash}")
+def test_portfolio_apply_transaction_len_check(
+        apple_asset, 
+        portfolio,
+        position):
+    
+    portfolio.add_position(position)
+
+   
+    transaction = Transaction(apple_asset, "BUY", 10, 220)
+     
+    portfolio.apply_transaction(transaction)
+
+    assert len(portfolio.transactions) == 1
+def test_transactions_returns_copy(
+        apple_asset,
+        portfolio,
+        position):
+
+    portfolio.add_position(position)
+
+    transaction = Transaction(apple_asset, "BUY", 10, 220)
+    portfolio.apply_transaction(transaction)
+
+    transactions = portfolio.transactions
+    transactions.clear()
+
+    assert len(portfolio.transactions) == 1    
 def test_initial_cash(portfolio):
     assert portfolio.initial_capital == 30000
 
@@ -504,7 +602,7 @@ def large_withdrawal():
     return CashFlow(
         15000,
         "WITHDRAWal",
-            dt.datetime(2026, 1, 1)
+            dt.datetime(2026, 1, 1, 1)
     )
 def test_apply_cash_flow_withdrawal(position, portfolio, cash_withdraw):
     portfolio.add_position(position)  
@@ -582,6 +680,7 @@ def test_cash_flow_cannot_have_same_timestamp(portfolio, cash_deposit):
             match= "Cash flow timestamp must be later than the previous cash flow"
         ):
             portfolio.apply_cash_flow(cash_withdraw)
+
 def test_cash_flow_but_have_timestamp_one_min(portfolio, cash_deposit):
     portfolio.apply_cash_flow(cash_deposit)
 
@@ -595,7 +694,7 @@ def test_cash_flow_but_have_timestamp_one_min(portfolio, cash_deposit):
 
     assert portfolio.cash == 34500
 
-# # after timestamp
+# # after timestamp value_at
 
 def test_value_at_with_exact_timestamp(position, portfolio):
     portfolio.add_position(position)
@@ -650,3 +749,22 @@ def test_value_at_includes_cash(position, portfolio):
     timestamp = dt.datetime(2026, 1, 3)
 
     assert portfolio.value_at(timestamp) == 11000 + portfolio.cash
+
+###### cash_at
+def test_cash_at_with_exact_timestamp(position, portfolio):
+    portfolio.add_position(position)
+    timestamp = dt.datetime(2026, 1, 3)
+
+    assert portfolio.cash_at(timestamp) == 30000
+
+def test_cash_at_timestamp_between_prices(
+        position, 
+        portfolio, 
+        cash_deposit, 
+        large_withdrawal):
+    portfolio.add_position(position)
+    portfolio.apply_cash_flow(cash_deposit)
+    portfolio.apply_cash_flow(large_withdrawal)
+    timestamp = dt.datetime(2026, 1, 2)
+
+    assert portfolio.cash_at(timestamp) == 20000

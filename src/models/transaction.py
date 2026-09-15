@@ -1,11 +1,13 @@
 from asset import Asset
+import datetime as dt
 class Transaction():
     def __init__(
             self, 
             asset:Asset, 
             transaction_type: str, 
             quantity: float,
-            price: float
+            price: float,
+            timestamp: dt.datetime
             ) -> None:
 
         if not isinstance(asset, Asset):
@@ -20,10 +22,14 @@ class Transaction():
         if price <= 0:
             raise ValueError("Price must be greater than zero")
 
+        if not isinstance(timestamp, dt.datetime):
+            raise TypeError("timestamp must be a datetime")
+
         self._asset = asset
         self._transaction_type = transaction_type.upper()
         self._quantity = quantity
         self._price = price
+        self._timestamp = timestamp
 
     @property
     def asset(self) -> Asset:
@@ -40,6 +46,11 @@ class Transaction():
     @property
     def price(self) -> float:
         return self._price
+
+    @property 
+    def timestamp(self) -> dt.datetime:
+        return self._timestamp
+    
 
     def total_value(self) -> float:
         return self.quantity * self.price

@@ -19,10 +19,16 @@ class Portfolio:
 
         self._cash = initial_capital
         self._cash_flows:list = []
+        self._transactions = []
+
 
     @property
     def cash_flows(self) -> list: 
         return self._cash_flows.copy()
+
+    @property
+    def transactions(self) -> list:
+        return self._transactions.copy()
 
     @property
     def name(self) -> str:
@@ -144,8 +150,13 @@ class Portfolio:
         return cost_basis / self.total_cost() * 100
 
     def apply_transaction(self, transaction: Transaction) -> None:
+        
         if transaction.asset not in self._positions:
             raise ValueError("Asset not found in portfolio")
+
+        if transaction.transaction_type == "BUY":
+            if transaction.total_value() > self._cash:
+                raise ValueError("insufficient cash")
 
         position = self._positions[transaction.asset]
         position.apply_transaction(transaction)
@@ -153,8 +164,11 @@ class Portfolio:
         if transaction.transaction_type == "SELL":
             self._cash += transaction.total_value()
     
-        if transaction.transaction_type == "BUY":
+        elif transaction.transaction_type == "BUY":
             self._cash -= transaction.total_value()
+
+        #to keep transactions history
+        self._transactions.append(transaction)
 
     def apply_cash_flow(self, cash_flow: CashFlow) -> None:
 

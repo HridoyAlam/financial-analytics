@@ -3,12 +3,21 @@ from stock import Stock
 from position import Position
 from portfolio import Portfolio
 import pytest
+import datetime as dt
+
 @pytest.fixture
-def asset():
+def price_history():
+    return [
+    (dt.datetime(2026, 1, 1), 100),
+    (dt.datetime(2026, 1, 2), 105),
+    (dt.datetime(2026, 1, 3), 110),
+]
+@pytest.fixture
+def asset(price_history):
     return Stock(
         "AAPL",
         "Apple Inc.",
-        [100, 105, 110],
+        price_history,
         "Technology",
         2.0
     )
@@ -32,18 +41,21 @@ def test_valid_buy_transaction(asset, param):
                 asset,
                 param,
                 20,
-                500
+                500,
+                dt.datetime(2026,1,5)
             )
     assert transaction.transaction_type == "BUY"
     assert transaction.quantity == 20
     assert transaction.price == 500
+    assert transaction.timestamp == dt.datetime(2026, 1, 5)
 @pytest.mark.parametrize("param", ["sell", "SELL", "Sell"])
 def test_valid_sell_transaction(asset, param):
     transaction = Transaction(
                 asset,
                 param,
                 20,
-                500
+                500,
+                dt.datetime(2026,1,5)
             )
     assert transaction.transaction_type == "SELL"
     
@@ -57,7 +69,8 @@ def test_invalid_quantity_buy_transaction(asset):
             asset,
             "BUY",
             -20,
-            500
+            500,
+            dt.datetime(2026,1,5)
         )
 def test_invalid_price_sell_transaction(asset):
     with pytest.raises(
@@ -68,7 +81,8 @@ def test_invalid_price_sell_transaction(asset):
             asset,
             "sell",
             20,
-            -500
+            -500,
+            dt.datetime(2026,1,5)
         )
 
 
@@ -77,7 +91,8 @@ def test_total_value(asset):
         asset,
         "BUY",
         50,
-        100
+        100,
+        dt.datetime(2026,1,5)
         )
 
     assert transaction.total_value() == pytest.approx(5000)
@@ -91,7 +106,8 @@ def test_invalid_transaction_type(asset):
             asset,
             "Hold",
             50,
-            100
+            100,
+            dt.datetime(2026,1,5)
             )
     
 def test_invalid_asset():
@@ -103,5 +119,18 @@ def test_invalid_asset():
                     "MSTP",
                     "BUY",
                     50,
-                    100
+                    100,
+                    dt.datetime(2026,1,5)
+                    )
+def test_invalid_timestamp(asset):
+    with pytest.raises(
+        TypeError,
+        match="timestamp must be a datetime"
+    ):
+        Transaction(
+                    asset,
+                    "BUY",
+                    50,
+                    100,
+                    (2026,1,5)
                     )

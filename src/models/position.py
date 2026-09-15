@@ -116,13 +116,15 @@ buy_transaction = Transaction(
     apple,
     "Buy",
     50,
-    220
+    220,
+    dt.datetime(2026, 1, 5)
 )
 sell_transaction = Transaction(
     apple,
     "Sell",
     30,
-    220
+    220,
+    dt.datetime(2026, 1, 6)
 )
 
 

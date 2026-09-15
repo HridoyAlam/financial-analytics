@@ -562,3 +562,7 @@ AAPL = 100 × 105 = 10,500
 MSFT = 50 × 205 = 10,250
 ───────
 Portfolio = 20,750
+
+================
+
+test_portfolio_apply_transaction_insufficient_cash_check_old check
